@@ -200,5 +200,43 @@
             }
         });
     </script>
+
+<script>
+        function getSunset(date) {
+            const lat = 55.7532; // Москва
+            const lng = 37.6225;
+            const radians = Math.PI / 180;
+            const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+            const decl = 0.409 * Math.sin(2 * Math.PI * (dayOfYear - 81) / 365);
+            const ha = Math.acos(-Math.tan(lat * radians) * Math.tan(decl));
+            const sunsetUTC = 12 + (ha / radians) / 15 - (lng / 15);
+            let local = sunsetUTC + 3; // MSK
+            const eqTime = 0.165 * Math.sin(2 * decl) - 0.126 * Math.cos(decl);
+            local -= eqTime;
+            const h = Math.floor(local);
+            const m = Math.floor((local - h) * 60);
+            return `${h}:${m < 10 ? '0' + m : m}`;
+        }
+
+        function init() {
+            const now = new Date();
+            const day = now.getDay(); 
+            let target = new Date(now);
+            let label = "Заход солнца в пятницу";
+
+            if (day === 6) { // Суббота
+                target.setDate(now.getDate() - 1);
+                label = "Заход солнца в прошлую пятницу";
+            } else {
+                let diff = (5 - day + 7) % 7;
+                target.setDate(now.getDate() + diff);
+            }
+
+            document.getElementById('sunset-display').innerText = getSunset(target);
+            document.getElementById('sunset-label').innerText = label;
+            document.getElementById('sunset-date').innerText = target.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        init();
+    </script>
 </body>
 </html>
