@@ -224,17 +224,18 @@
             let target = new Date(now);
             let label = "Заход солнца в пятницу";
 
-            if (day === 6) { // Суббота
+            if (day === 6) { // Суббота - показываем вчерашний заход
                 target.setDate(now.getDate() - 1);
-                label = "Заход солнца в прошлую пятницу";
+                label = "Суббота (Заход в пятницу был в)";
             } else {
                 let diff = (5 - day + 7) % 7;
                 target.setDate(now.getDate() + diff);
+                label = "Начало субботы (пятница)";
             }
 
             document.getElementById('sunset-display').innerText = getSunset(target);
             document.getElementById('sunset-label').innerText = label;
-            document.getElementById('sunset-date').innerText = target.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('sunset-date').innerText = target.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
         }
         init();
     </script>
