@@ -61,11 +61,27 @@
         #bible-ref { color: #e2b04a; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .loader-hidden { opacity: 0; visibility: hidden; }
-        /* Стиль виджета */
-        .sunset-container { background: rgba(226, 176, 74, 0.1); border: 1px solid #e2b04a; border-radius: 15px; padding: 15px; margin-bottom: 25px; text-align: center; }
-        #sunset-label { color: #e2b04a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        #sunset-display { color: #fff; font-size: 2.2rem; font-weight: bold; margin-bottom: 2px; }
-        #sunset-date { color: #888; font-size: 0.85rem; }
+
+        .sunset-container { 
+            background: rgba(226, 176, 74, 0.08); 
+            border: 1px solid #e2b04a; 
+            border-radius: 12px; 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        #sunset-label { 
+            color: #e2b04a; 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            margin-bottom: 2px;
+        }
+        #sunset-display { 
+            color: #fff; 
+            font-size: 1.8rem; 
+            font-weight: bold; 
+        }
     </style>
 </head>
 <body>
@@ -90,9 +106,8 @@
 
         <nav class="links">
             <div class="sunset-container">
-                <div id="sunset-label">Заход солнца</div>
+                <div id="sunset-label">Загрузка данных...</div>
                 <div id="sunset-display">--:--</div>
-                <div id="sunset-date">загрузка...</div>
             </div>
 
             <a href="https://kniga-knig.info/study/pqtchgl-fjtrylfrdaos" class="btn" target="_blank" rel="noopener">
@@ -126,22 +141,20 @@
         </nav>
 
         <footer>
-            <p>© 2026 Община на Стремянном</p>
+            <p>© <span id="year"></span> Община на Стремянном</p>
             <div class="contact-footer" style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px dashed #e2b04a;">
-    <p style="color: #e2b04a; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold;">НАПИШИТЕ НАМ:</p>
-    
-    <div style="margin-bottom: 10px;">
-        <a href="mailto:Info@asdmsk.ru" style="color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <i class="fas fa-envelope" style="color: #e2b04a;"></i> Info@asdmsk.ru
-        </a>
-    </div>
-
-    <div>
-        <a href="https://t.me/+79999750250" target="_blank" rel="noopener" style="color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <i class="fab fa-telegram" style="color: #e2b04a;"></i> Telegram: +7 (999) 975-02-50
-        </a>
-    </div>
-</div>
+                <p style="color: #e2b04a; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold;">НАПИШИТЕ НАМ:</p>
+                <div style="margin-bottom: 10px;">
+                    <a href="mailto:Info@asdmsk.ru" style="color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-envelope" style="color: #e2b04a;"></i> Info@asdmsk.ru
+                    </a>
+                </div>
+                <div>
+                    <a href="https://t.me/+79999750250" target="_blank" rel="noopener" style="color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fab fa-telegram" style="color: #e2b04a;"></i> Telegram: +7 (999) 975-02-50
+                    </a>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -157,6 +170,9 @@
     </div>
 
     <script>
+        // Год в футере
+        document.getElementById('year').textContent = new Date().getFullYear();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js', { scope: '/' })
@@ -222,18 +238,16 @@
                 loader.style.display = 'none';
             }
         });
-    </script>
 
-    <script>
         function getSunset(date) {
-            const lat = 55.7532; // Москва
+            const lat = 55.7532; 
             const lng = 37.6225;
             const radians = Math.PI / 180;
             const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
             const decl = 0.409 * Math.sin(2 * Math.PI * (dayOfYear - 81) / 365);
             const ha = Math.acos(-Math.tan(lat * radians) * Math.tan(decl));
             const sunsetUTC = 12 + (ha / radians) / 15 - (lng / 15);
-            let local = sunsetUTC + 3; // MSK
+            let local = sunsetUTC + 3; 
             const eqTime = 0.165 * Math.sin(2 * decl) - 0.126 * Math.cos(decl);
             local -= eqTime;
             const h = Math.floor(local);
@@ -245,20 +259,19 @@
             const now = new Date();
             const day = now.getDay(); 
             let target = new Date(now);
-            let label = "Заход солнца в пятницу";
+            let label = "";
 
-            if (day === 6) { // Суббота - показываем вчерашний заход
+            if (day === 6) {
                 target.setDate(now.getDate() - 1);
-                label = "Суббота (Заход в пятницу был в)";
+                label = "Суббота (заход вчера, " + target.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) + ")";
             } else {
                 let diff = (5 - day + 7) % 7;
                 target.setDate(now.getDate() + diff);
-                label = "Начало субботы (пятница)";
+                label = "Начало субботы (пятница, " + target.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) + ")";
             }
 
             document.getElementById('sunset-display').innerText = getSunset(target);
             document.getElementById('sunset-label').innerText = label;
-            document.getElementById('sunset-date').innerText = target.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
         }
         init();
     </script>
