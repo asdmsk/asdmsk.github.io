@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "ru.asdmsk.app",
-    "sha256_cert_fingerprints": ["DB:4B:53:F1:06:D4:D0:83:2B:93:13:CA:A3:09:E0:28:55:C2:67:B0:EE:F4:83:4D:C3:87:92:79:CB:CF:2E:BA"]
+    "sha256_cert_fingerprints": ["34:00:AA:96:48:8A:4D:D3:10:83:6F:FB:67:68:9C:3E:92:AB:60:28:6D:44:83:1B:34:F1:5F:5D:C9:F4:A0:4B"]
   }
 }]
