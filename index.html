@@ -61,6 +61,11 @@
         #bible-ref { color: #e2b04a; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .loader-hidden { opacity: 0; visibility: hidden; }
+        /* Стиль виджета */
+        .sunset-container { background: rgba(226, 176, 74, 0.1); border: 1px solid #e2b04a; border-radius: 15px; padding: 15px; margin-bottom: 25px; text-align: center; }
+        #sunset-label { color: #e2b04a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        #sunset-display { color: #fff; font-size: 2.2rem; font-weight: bold; margin-bottom: 2px; }
+        #sunset-date { color: #888; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -84,6 +89,12 @@
         </header>
 
         <nav class="links">
+            <div class="sunset-container">
+                <div id="sunset-label">Заход солнца</div>
+                <div id="sunset-display">--:--</div>
+                <div id="sunset-date">загрузка...</div>
+            </div>
+
             <a href="https://kniga-knig.info/study/pqtchgl-fjtrylfrdaos" class="btn" target="_blank" rel="noopener">
                 <i class="fas fa-book-open"></i><span>ШКОЛА БИБЛИИ</span>
             </a>
@@ -131,7 +142,6 @@
     </div>
 
     <script>
-        // 1. Регистрация Service Worker (корень)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js', { scope: '/' })
@@ -140,7 +150,6 @@
             });
         }
 
-        // 2. Логика баннера установки
         let deferredPrompt;
         const installBanner = document.getElementById('install-banner');
         const btnInstall = document.getElementById('btn-install');
@@ -165,7 +174,6 @@
             }
         });
 
-        // 3. Логика анимации загрузки и цитат
         window.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('loader-wrapper');
             const quoteElement = document.getElementById('bible-quote');
@@ -201,7 +209,7 @@
         });
     </script>
 
-<script>
+    <script>
         function getSunset(date) {
             const lat = 55.7532; // Москва
             const lng = 37.6225;
@@ -240,4 +248,4 @@
         init();
     </script>
 </body>
-</html>
+</html>
