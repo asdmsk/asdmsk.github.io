@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Объявления | Адвентисты Каждый День</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body { background: #000; margin: 0; padding: 0; font-family: sans-serif; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; text-align: center; }
+        
+        /* Стили для iframe */
+        .iframe-container {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 15px;
+            border: 1px solid #e2b04a;
+            background: #fff; 
+            margin-top: 20px;
+            -webkit-overflow-scrolling: touch; /* Плавный скролл для iOS */
+        }
+
+        /* Модальное окно */
+        #ads-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: #1a1a1a;
+            margin: 15% auto;
+            padding: 30px;
+            border: 2px solid #e2b04a;
+            width: 85%;
+            max-width: 450px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(226, 176, 74, 0.3);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px; top: 10px;
+            color: #888;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .modal-h2 { color: #e2b04a; margin-bottom: 15px; font-size: 1.4rem; }
+        .modal-p { color: #ccc; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.4; }
+
+        .modal-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-email { background: #fff; color: #000; }
+        .btn-tg { background: #0088cc; color: #fff; }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #e2b04a;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> На главную</a>
+        <h1 style="color: #e2b04a; margin-top: 15px; margin-bottom: 5px;">ОБЪЯВЛЕНИЯ</h1>
+        <p style="color: #888; font-size: 0.8rem; margin-bottom: 20px;">Московское объединение</p>
+    </header>
+
+    <div class="iframe-container">
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTCmm2vGARs0oV6QRI6pPMQi0XWgIF-nlppH0h3K4rj1ne_xOtnBp4YvwhHSXXKkvVV4qipCk5inUO-/pubhtml?widget=false&amp;chrome=false&amp;headers=false" 
+                width="100%" height="1500" frameborder="0"></iframe>
+    </div>
+
+    <footer style="margin-top: 30px; padding: 20px; color: #555; font-size: 0.8rem;">
+        © <span id="year"></span> Община на Стремянном
+    </footer>
+</div>
+
+<div id="ads-modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 class="modal-h2">Будьте в курсе событий!</h2>
+        <p class="modal-p">Подпишитесь на рассылку объявлений, чтобы не пропустить важные новости общины.</p>
+        
+        <a href="https://forms.gle/VUm5cB16Bes51hSs8" target="_blank" class="modal-btn btn-email">
+            <i class="fas fa-envelope"></i> Подписаться по почте
+        </a>
+        
+        <a href="https://t.me/rupor_mo" target="_blank" class="modal-btn btn-tg">
+            <i class="fab fa-telegram-plane"></i> Подписаться в Telegram
+        </a>
+    </div>
+</div>
+
+<script>
+    // Авто-год в футере
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Логика модального окна
+    const modal = document.getElementById("ads-modal");
+    const closeBtn = document.getElementsByClassName("close-modal")[0];
+
+    window.onload = function() {
+        setTimeout(() => {
+            if (!sessionStorage.getItem('bannerClosed')) {
+                modal.style.display = "block";
+            }
+        }, 3000);
+    }
+
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+        sessionStorage.setItem('bannerClosed', 'true');
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            sessionStorage.setItem('bannerClosed', 'true');
+        }
+    }
+</script>
+
+</body>
+</html>
