@@ -17,7 +17,6 @@
     <meta name="theme-color" content="#000000">
 
     <title>Адвентисты Седьмого Дня в Москве | Ресурсы, Трансляции, Проповеди</title>
-    <meta name="description" content="Официальные ресурсы Общины на Стремянном и Духовного центра на Нагатинской.">
     
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="apple-touch-icon" href="/logo.png">
@@ -42,31 +41,33 @@
         }
         .loader-content { width: 100%; max-width: 400px; padding: 20px; text-align: center; }
         .spinner {
-            width: 50px; height: 50px;
-            border: 4px solid #222;
-            border-top: 4px solid #e2b04a;
+            width: 40px; height: 40px;
+            border: 3px solid #222;
+            border-top: 3px solid #e2b04a;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 30px;
+            margin: 0 auto 25px;
         }
         #bible-quote { color: #fff; font-style: italic; font-size: 1.1rem; min-height: 100px; line-height: 1.5; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
         #bible-ref { color: #e2b04a; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+        
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .loader-hidden { opacity: 0; visibility: hidden; }
 
-        /* Стили захода солнца */
+        /* Баннер субботы */
         .sunset-container { 
             background: rgba(226, 176, 74, 0.08); 
             border: 1px solid #e2b04a; 
             border-radius: 12px; 
-            padding: 10px; 
+            padding: 12px; 
             margin-bottom: 20px; 
-            text-align: center; 
+            text-align: center;
+            transition: box-shadow 0.3s;
         }
-        #sunset-label { color: #e2b04a; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        #sunset-label { color: #e2b04a; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         #sunset-display { color: #fff; font-size: 1.8rem; font-weight: bold; }
 
-        /* Анимация пульсации для кнопки объявлений */
+        /* Кнопка новых объявлений */
         @keyframes glow-pulse {
             0% { box-shadow: 0 0 5px rgba(226, 176, 74, 0.4); transform: scale(1); }
             50% { box-shadow: 0 0 20px rgba(226, 176, 74, 0.7); transform: scale(1.02); }
@@ -75,6 +76,7 @@
     </style>
 </head>
 <body>
+
     <div id="loader-wrapper">
         <div class="loader-content">
             <div class="spinner"></div>
@@ -96,7 +98,7 @@
 
         <nav class="links">
             <div class="sunset-container">
-                <div id="sunset-label">Загрузка данных...</div>
+                <div id="sunset-label">ЗАГРУЗКА...</div>
                 <div id="sunset-display">--:--</div>
             </div>
 
@@ -104,16 +106,10 @@
                 <a href="page14.html" style="text-decoration: none;">
                     <div style="
                         background: linear-gradient(45deg, #e2b04a, #ffcc66);
-                        color: #000;
-                        padding: 18px;
-                        border-radius: 15px;
-                        font-weight: 900;
-                        text-align: center;
+                        color: #000; padding: 18px; border-radius: 15px;
+                        font-weight: 900; text-align: center;
                         animation: glow-pulse 2s infinite;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 12px;
+                        display: flex; align-items: center; justify-content: center; gap: 12px;
                         cursor: pointer;
                     ">
                         <i class="fas fa-bullhorn" style="font-size: 1.3rem;"></i>
@@ -130,7 +126,7 @@
                 <i class="fab fa-telegram-plane"></i><span>АДВЕНТИСТЫ КАЖДЫЙ ДЕНЬ</span>
             </a>
 
-            <div class="divider"><span>ТРАНСЛЯЦИИ</span></div>
+            <div class="divider"><span>ТРАНСЛЯЦИИ ОБЩИН</span></div>
             <a href="page3.html" class="btn"><i class="fas fa-broadcast-tower"></i><span>ПРЯМЫЕ ТРАНСЛЯЦИИ RUTUBE</span></a>
             <a href="page2.html" class="btn"><i class="fab fa-youtube"></i><span>ПРЯМЫЕ ТРАНСЛЯЦИИ YOUTUBE</span></a>
 
@@ -175,9 +171,9 @@
             <img src="logo.png" style="width: 45px; height: 45px; border-radius: 10px; border: 1px solid #333;">
             <div style="flex: 1; text-align: left;">
                 <p style="font-size: 0.9rem; font-weight: bold; margin: 0;">Установите приложение</p>
-                <p style="font-size: 0.7rem; color: #888; margin: 0;">Для быстрого доступа к материалам</p>
+                <p style="font-size: 0.7rem; color: #888; margin: 0;">Для быстрого доступа</p>
             </div>
-            <button id="btn-install" style="background: #e2b04a; border: none; padding: 8px 12px; border-radius: 20px; color: black; font-weight: bold; font-size: 0.75rem; cursor: pointer; text-transform: uppercase;">ОК</button>
+            <button id="btn-install" style="background: #e2b04a; border: none; padding: 8px 12px; border-radius: 20px; color: black; font-weight: bold; font-size: 0.75rem;">ОК</button>
         </div>
     </div>
 
@@ -195,7 +191,44 @@
             } catch (e) { console.warn("Фоновая проверка объявлений не удалась"); }
         })();
 
-        // --- 2. ЛОГИКА ЗАСТАВКИ (БИБЛЕЙСКИЕ ТЕКСТЫ) ---
+        // --- 2. РАСЧЕТ ЗАХОДА СОЛНЦА ---
+        function getSunset(date) {
+            const lat = 55.7532; const lng = 37.6225;
+            const radians = Math.PI / 180;
+            const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+            const decl = 0.409 * Math.sin(2 * Math.PI * (dayOfYear - 81) / 365);
+            const ha = Math.acos(-Math.tan(lat * radians) * Math.tan(decl));
+            const sunsetUTC = 12 + (ha / radians) / 15 - (lng / 15);
+            let local = sunsetUTC + 3; // MSK
+            const eqTime = 0.165 * Math.sin(2 * decl) - 0.126 * Math.cos(decl);
+            local -= eqTime;
+            const h = Math.floor(local);
+            const m = Math.floor((local - h) * 60);
+            return `${h}:${m < 10 ? '0' + m : m}`;
+        }
+
+        function initSunset() {
+            const now = new Date();
+            const day = now.getDay(); 
+            let target = new Date(now);
+            const dateOptions = { day: 'numeric', month: 'long' };
+            const formattedDate = (d) => d.toLocaleDateString('ru-RU', dateOptions).toUpperCase();
+
+            if (day === 6) {
+                // СУББОТА
+                document.getElementById('sunset-label').innerText = "ЗАХОД СОЛНЦА СЕГОДНЯ (" + formattedDate(target) + ")";
+                document.querySelector('.sunset-container').style.boxShadow = "0 0 15px rgba(226, 176, 74, 0.2)";
+            } else {
+                // ВС-ПТ
+                let diff = (5 - day + 7) % 7;
+                target.setDate(now.getDate() + diff);
+                document.getElementById('sunset-label').innerText = "НАЧАЛО СУББОТЫ (ПЯТНИЦА, " + formattedDate(target) + ")";
+            }
+            document.getElementById('sunset-display').innerText = getSunset(target);
+        }
+        initSunset();
+
+        // --- 3. ЛОГИКА ЛОАДЕРА ---
         const quotes = [
             { text: "«Будь тверд и очень мужествен... ибо с тобою Господь Бог твой везде, куда ни пойдешь»", ref: "Иисус Навин 1:9" },
             { text: "«Да не смущается сердце ваше... Я приду опять и возьму вас к Себе»", ref: "Иоанна 14:1-3" },
@@ -210,14 +243,10 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('loader-wrapper');
-            const quoteElement = document.getElementById('bible-quote');
-            const refElement = document.getElementById('bible-ref');
-
             if (!sessionStorage.getItem('firstLoadDone')) {
-                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                quoteElement.innerText = randomQuote.text;
-                refElement.innerText = randomQuote.ref;
-
+                const q = quotes[Math.floor(Math.random() * quotes.length)];
+                document.getElementById('bible-quote').innerText = q.text;
+                document.getElementById('bible-ref').innerText = q.ref;
                 setTimeout(() => {
                     loader.classList.add('loader-hidden');
                     sessionStorage.setItem('firstLoadDone', 'true');
@@ -227,50 +256,15 @@
             }
         });
 
-        // --- 3. РАСЧЕТ ЗАХОДА СОЛНЦА ---
-        function getSunset(date) {
-            const lat = 55.7532; const lng = 37.6225;
-            const radians = Math.PI / 180;
-            const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
-            const decl = 0.409 * Math.sin(2 * Math.PI * (dayOfYear - 81) / 365);
-            const ha = Math.acos(-Math.tan(lat * radians) * Math.tan(decl));
-            const sunsetUTC = 12 + (ha / radians) / 15 - (lng / 15);
-            let local = sunsetUTC + 3;
-            const eqTime = 0.165 * Math.sin(2 * decl) - 0.126 * Math.cos(decl);
-            local -= eqTime;
-            const h = Math.floor(local);
-            const m = Math.floor((local - h) * 60);
-            return `${h}:${m < 10 ? '0' + m : m}`;
-        }
-
-        function initSunset() {
-            const now = new Date();
-            const day = now.getDay(); 
-            let target = new Date(now);
-            let label = "";
-            if (day === 6) {
-                target.setDate(now.getDate() - 1);
-                label = "Суббота (заход вчера)";
-            } else {
-                let diff = (5 - day + 7) % 7;
-                target.setDate(now.getDate() + diff);
-                label = "Начало субботы (пятница)";
-            }
-            document.getElementById('sunset-display').innerText = getSunset(target);
-            document.getElementById('sunset-label').innerText = label;
-        }
-        initSunset();
-
-        // --- 4. ГОД И SERVICE WORKER (PWA) ---
+        // --- 4. ВСПОМОГАТЕЛЬНОЕ (ГОД, PWA) ---
         document.getElementById('year').textContent = new Date().getFullYear();
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
 
-        // --- 5. ЛОГИКА УСТАНОВКИ ПРИЛОЖЕНИЯ ---
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
