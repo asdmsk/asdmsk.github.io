@@ -178,16 +178,34 @@
     </div>
 
     <script>
-        // --- 1. ПРОВЕРКА ОБЪЯВЛЕНИЙ (ФОНОВАЯ И МОМЕНТАЛЬНАЯ) ---
+        // --- 1. ПРОВЕРКА ОБЪЯВЛЕНИЙ С КЭШЕМ (30 МИНУТ) ---
         (async function checkAdsImmediately() {
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbwzj6dq4_XP1GjZdPeMoR-M817V-3aldnPf9BfeUpleQHEB7sbfW7XCfTtQ08MFoKah/exec';
-            try {
-                const response = await fetch(scriptUrl + '?t=' + Date.now());
-                const data = await response.json();
-                if (data && data.showButton) {
-                    const btn = document.getElementById('ads-trigger-container');
-                    if (btn) btn.style.display = 'block';
+            const CACHE_KEY = 'ads_button_cache';
+            const CACHE_TIME = 30 * 60 * 1000; // 30 минут
+            
+            const cached = localStorage.getItem(CACHE_KEY);
+            const now = Date.now();
+
+            if (cached) {
+                const cacheData = JSON.parse(cached);
+                if (now - cacheData.timestamp < CACHE_TIME) {
+                    if (cacheData.show) document.getElementById('ads-trigger-container').style.display = 'block';
+                    return;
                 }
+            }
+
+            try {
+                const response = await fetch(scriptUrl + '?t=' + now);
+                const data = await response.json();
+                const shouldShow = !!(data && data.showButton);
+                
+                if (shouldShow) document.getElementById('ads-trigger-container').style.display = 'block';
+                
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    timestamp: now,
+                    show: shouldShow
+                }));
             } catch (e) { console.warn("Фоновая проверка объявлений не удалась"); }
         })();
 
@@ -215,11 +233,9 @@
             const formattedDate = (d) => d.toLocaleDateString('ru-RU', dateOptions).toUpperCase();
 
             if (day === 6) {
-                // СУББОТА
                 document.getElementById('sunset-label').innerText = "ЗАХОД СОЛНЦА СЕГОДНЯ (" + formattedDate(target) + ")";
                 document.querySelector('.sunset-container').style.boxShadow = "0 0 15px rgba(226, 176, 74, 0.2)";
             } else {
-                // ВС-ПТ
                 let diff = (5 - day + 7) % 7;
                 target.setDate(now.getDate() + diff);
                 document.getElementById('sunset-label').innerText = "НАЧАЛО СУББОТЫ (ПЯТНИЦА, " + formattedDate(target) + ")";
