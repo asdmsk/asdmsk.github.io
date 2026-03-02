@@ -109,11 +109,46 @@
                 <div id="sunset-label">Загрузка данных...</div>
                 <div id="sunset-display">--:--</div>
             </div>
+              <div id="ads-trigger-container" style="display: none; margin: 20px 0;">
+    <a href="page14.html" style="text-decoration: none;">
+        <div style="
+            background: linear-gradient(45deg, #e2b04a, #ffcc66);
+            color: #000;
+            padding: 18px;
+            border-radius: 15px;
+            font-weight: 900;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(226, 176, 74, 0.6);
+            animation: glow-pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+        ">
+            <i class="fas fa-bullhorn" style="font-size: 1.3rem;"></i>
+            ЕСТЬ НОВЫЕ ОБЪЯВЛЕНИЯ!
+        </div>
+    </a>
+</div>
 
+<script>
+async function checkAds() {
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzykwhQEp2fS5-FDfWgRFAOiBfpqxSs-_o47Cvsl2MZEisFg9Mmt4Us7xiPQU3kWbmX/exec';
+    try {
+        const response = await fetch(scriptUrl + '?t=' + Date.now());
+        const data = await response.json();
+        if (data.showButton) {
+            document.getElementById('ads-trigger-container').style.display = 'block';
+        }
+    } catch (e) { console.error("Ошибка проверки объявлений"); }
+}
+checkAds();
+</script>
             <a href="https://kniga-knig.info/study/pqtchgl-fjtrylfrdaos" class="btn" target="_blank" rel="noopener">
                 <i class="fas fa-book-open"></i><span>ШКОЛА БИБЛИИ</span>
             </a>
-            <a href="page1.html" class="btn"><i class="fas fa-play-circle"></i><span>ВИДЕОЗАПИСИ</span></a>
+            <a href="page1.html" class="btn"><i class="fas fa-play-circle"></i><span>ВИДЕОЗАПИСИ ОБЩИНЫ</span></a>
             <a href="https://t.me/+-KjH6rEZgDY0MjBi" class="btn" target="_blank" rel="noopener">
                 <i class="fab fa-telegram-plane"></i><span>АДВЕНТИСТЫ КАЖДЫЙ ДЕНЬ</span>
             </a>
