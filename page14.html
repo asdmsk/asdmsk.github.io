@@ -13,63 +13,66 @@
         body { 
             background: #000; margin: 0; padding: 0; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #fff; 
+            color: #fff; padding-bottom: 110px; 
         }
 
         .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
 
+        /* Карточки объявлений */
         .ad-card {
-            background: #111;
-            border: 1px solid #e2b04a;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            text-align: left;
-            animation: fadeIn 0.5s ease forwards;
+            background: #0a0a0a; border: 1px solid #e2b04a;
+            border-radius: 12px; padding: 18px; margin-bottom: 20px;
+            animation: fadeIn 0.4s ease forwards;
         }
 
-        .ad-title { color: #e2b04a; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 8px; }
-        .ad-text { line-height: 1.5; color: #ddd; white-space: pre-wrap; font-size: 0.95rem; margin-bottom: 15px; }
+        .ad-title { color: #e2b04a; font-size: 1rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 6px; }
+        .ad-text { line-height: 1.5; color: #bbb; white-space: pre-wrap; font-size: 0.9rem; }
         
-        /* Сетка для маленьких кнопок */
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 колонки */
-            gap: 8px;
-            margin-top: 15px;
-        }
+        /* Сетка ссылок в объявлении */
+        .links-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 15px; }
 
         .ad-link-btn {
-            background: rgba(226, 176, 74, 0.1);
-            color: #e2b04a;
-            text-decoration: none;
-            padding: 8px 4px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.7rem; /* Уменьшенный шрифт для компактности */
-            border: 1px solid #e2b04a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            transition: 0.2s;
+            background: transparent; color: #e2b04a;
+            text-decoration: none; padding: 8px 2px; border-radius: 6px;
+            text-align: center; font-weight: bold; font-size: 0.65rem;
+            border: 1px solid #e2b04a; display: flex; flex-direction: column; align-items: center; gap: 3px;
         }
 
         .ad-link-btn i { font-size: 0.9rem; }
-        .ad-link-btn:active { background: #e2b04a; color: #000; }
+        .ad-link-btn:active { background: rgba(226, 176, 74, 0.2); }
 
-        /* Банер подписки */
-        #ads-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); }
-        .modal-content { position: absolute; bottom: 0; left: 0; width: 100%; background: #1a1a1a; padding: 30px 20px; border-top: 2px solid #e2b04a; border-radius: 25px 25px 0 0; box-sizing: border-box; text-align: center; animation: slideUp 0.5s ease; }
-        .modal-btn { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; margin: 12px 0; border-radius: 15px; text-decoration: none; font-weight: bold; }
-        .btn-email { background: #fff; color: #000; }
-        .btn-tg { background: #0088cc; color: #fff; }
+        /* Фиксированная панель подписки внизу */
+        .fixed-bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #333;
+            padding: 10px 15px 25px 15px;
+            display: flex; flex-direction: column; align-items: center;
+            box-sizing: border-box; z-index: 9999;
+        }
 
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-label {
+            color: #666; font-size: 0.65rem; font-weight: bold; 
+            letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase;
+        }
 
-        .back-link { display: inline-flex; align-items: center; gap: 5px; color: #e2b04a; text-decoration: none; margin-bottom: 20px; font-size: 0.9rem; }
+        .nav-buttons-row {
+            display: flex; justify-content: center; gap: 12px; width: 100%;
+        }
+
+        .nav-btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 10px 15px; border-radius: 8px;
+            text-decoration: none; font-weight: bold; font-size: 0.7rem;
+            border: 1px solid #e2b04a; color: #e2b04a;
+            background: transparent; transition: 0.2s; min-width: 130px;
+        }
+
+        .nav-btn:active { background: #e2b04a; color: #000; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .back-link { display: inline-flex; align-items: center; gap: 5px; color: #e2b04a; text-decoration: none; margin-bottom: 15px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -77,25 +80,27 @@
 <div class="container">
     <header>
         <a href="index.html" class="back-link"><i class="fas fa-chevron-left"></i> На главную</a>
-        <h2 style="color: #e2b04a; margin: 0;">ОБЪЯВЛЕНИЯ</h2>
-        <p style="color: #888; font-size: 0.75rem; margin-bottom: 25px;">Московское объединение</p>
+        <h2 style="color: #e2b04a; margin: 0; font-size: 1.3rem;">ОБЪЯВЛЕНИЯ</h2>
+        <p style="color: #666; font-size: 0.7rem; margin-bottom: 20px;">Московское объединение</p>
     </header>
 
-    <div id="loader" style="color: #666; margin-top: 50px; text-align: center; font-size: 0.9rem;">Загрузка актуальных данных...</div>
+    <div id="loader" style="color: #444; margin-top: 40px; text-align: center; font-size: 0.8rem;">Загрузка актуальных новостей...</div>
     <div id="ads-list"></div>
 
-    <footer style="margin-top: 40px; padding-bottom: 30px; color: #444; font-size: 0.7rem; text-align: center;">
+    <footer style="margin-top: 30px; color: #333; font-size: 0.65rem; text-align: center;">
         © <span id="year"></span> Община на Стремянном
     </footer>
 </div>
 
-<div id="ads-modal">
-    <div class="modal-content">
-        <div style="width: 40px; height: 4px; background: #333; border-radius: 2px; margin: -15px auto 20px;"></div>
-        <h3 style="color: #e2b04a; margin-bottom: 10px; font-size: 1.1rem;">ПОДПИШИТЕСЬ НА ОБЪЯВЛЕНИЯ</h3>
-        <a href="https://forms.gle/VUm5cB16Bes51hSs8" target="_blank" class="modal-btn btn-email"><i class="fas fa-envelope"></i> ПО ПОЧТЕ</a>
-        <a href="https://t.me/rupor_mo" target="_blank" class="modal-btn btn-tg"><i class="fab fa-telegram-plane"></i> В TELEGRAM</a>
-        <button onclick="closeModal()" style="background:none; border:none; color:#666; margin-top:15px; cursor:pointer;">Закрыть</button>
+<div class="fixed-bottom-nav">
+    <div class="nav-label">Подписаться на объявления</div>
+    <div class="nav-buttons-row">
+        <a href="https://forms.gle/VUm5cB16Bes51hSs8" target="_blank" class="nav-btn">
+            <i class="fas fa-envelope"></i> ПО ПОЧТЕ (EMAIL)
+        </a>
+        <a href="https://t.me/rupor_mo" target="_blank" class="nav-btn">
+            <i class="fab fa-telegram-plane"></i> В TELEGRAM
+        </a>
     </div>
 </div>
 
@@ -122,15 +127,13 @@
                 if (urls) {
                     linksHtml = '<div class="links-grid">';
                     urls.forEach((url, index) => {
-                        // Пытаемся понять тип ссылки для иконки
-                        let icon = 'fa-link';
-                        if (url.includes('youtube')) icon = 'fa-play-circle';
-                        if (url.includes('google')) icon = 'fa-file-alt';
+                        let isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+                        let icon = isYoutube ? 'fa-brands fa-youtube' : 'fa-solid fa-play-circle';
                         
                         linksHtml += `
                             <a href="${url}" target="_blank" class="ad-link-btn">
-                                <i class="fas ${icon}"></i>
-                                ССЫЛКА ${index + 1}
+                                <i class="${icon}"></i>
+                                ${isYoutube ? 'СМОТРЕТЬ' : 'ПЕРЕЙТИ'}
                             </a>`;
                         text = text.replace(url, ""); 
                     });
@@ -141,25 +144,11 @@
                 list.appendChild(card);
             });
         } catch (e) {
-            document.getElementById('loader').innerText = "На данный момент объявлений нет.";
+            document.getElementById('loader').innerText = "На данный момент новостей нет.";
         }
     }
 
-    function closeModal() {
-        document.getElementById("ads-modal").style.display = "none";
-        sessionStorage.setItem('bannerClosed', 'true');
-    }
-
-    window.onload = () => {
-        loadAds();
-        setTimeout(() => {
-            if (!sessionStorage.getItem('bannerClosed')) {
-                document.getElementById("ads-modal").style.display = "block";
-            }
-        }, 3000);
-    };
-
-    window.onclick = (e) => { if (e.target.id === "ads-modal") closeModal(); };
+    window.onload = loadAds;
 </script>
 
 </body>
