@@ -107,44 +107,72 @@
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbwzj6dq4_XP1GjZdPeMoR-M817V-3aldnPf9BfeUpleQHEB7sbfW7XCfTtQ08MFoKah/exec'; 
+    const CACHE_KEY = 'ads_cache_data';
+    const CACHE_TIME = 10 * 60 * 1000; // 10 минут
+
+    function renderAds(data) {
+        const list = document.getElementById('ads-list');
+        list.innerHTML = '';
+        document.getElementById('loader').style.display = 'none';
+
+        data.forEach(ad => {
+            const card = document.createElement('div');
+            card.className = 'ad-card';
+            
+            let text = ad.description;
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const urls = text.match(urlRegex);
+            
+            let linksHtml = '';
+            if (urls) {
+                linksHtml = '<div class="links-grid">';
+                urls.forEach((url, index) => {
+                    let isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+                    let icon = isYoutube ? 'fa-brands fa-youtube' : 'fa-solid fa-play-circle';
+                    
+                    linksHtml += `
+                        <a href="${url}" target="_blank" class="ad-link-btn">
+                            <i class="${icon}"></i>
+                            ${isYoutube ? 'СМОТРЕТЬ' : 'ПЕРЕЙТИ'}
+                        </a>`;
+                    text = text.replace(url, ""); 
+                });
+                linksHtml += '</div>';
+            }
+
+            card.innerHTML = `<div class="ad-title">${ad.title}</div><div class="ad-text">${text.trim()}</div>${linksHtml}`;
+            list.appendChild(card);
+        });
+    }
 
     async function loadAds() {
+        const cached = localStorage.getItem(CACHE_KEY);
+        const now = Date.now();
+
+        if (cached) {
+            const cacheData = JSON.parse(cached);
+            if (now - cacheData.timestamp < CACHE_TIME) {
+                renderAds(cacheData.items);
+                return;
+            }
+        }
+
         try {
-            const response = await fetch(scriptUrl + '?full=true&t=' + Date.now());
+            const response = await fetch(scriptUrl + '?full=true&t=' + now);
             const data = await response.json();
-            const list = document.getElementById('ads-list');
-            document.getElementById('loader').style.display = 'none';
+            
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                timestamp: now,
+                items: data
+            }));
 
-            data.forEach(ad => {
-                const card = document.createElement('div');
-                card.className = 'ad-card';
-                
-                let text = ad.description;
-                const urlRegex = /(https?:\/\/[^\s]+)/g;
-                const urls = text.match(urlRegex);
-                
-                let linksHtml = '';
-                if (urls) {
-                    linksHtml = '<div class="links-grid">';
-                    urls.forEach((url, index) => {
-                        let isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
-                        let icon = isYoutube ? 'fa-brands fa-youtube' : 'fa-solid fa-play-circle';
-                        
-                        linksHtml += `
-                            <a href="${url}" target="_blank" class="ad-link-btn">
-                                <i class="${icon}"></i>
-                                ${isYoutube ? 'СМОТРЕТЬ' : 'ПЕРЕЙТИ'}
-                            </a>`;
-                        text = text.replace(url, ""); 
-                    });
-                    linksHtml += '</div>';
-                }
-
-                card.innerHTML = `<div class="ad-title">${ad.title}</div><div class="ad-text">${text.trim()}</div>${linksHtml}`;
-                list.appendChild(card);
-            });
+            renderAds(data);
         } catch (e) {
-            document.getElementById('loader').innerText = "На данный момент новостей нет.";
+            if (cached) {
+                renderAds(JSON.parse(cached).items);
+            } else {
+                document.getElementById('loader').innerText = "На данный момент новостей нет.";
+            }
         }
     }
 
