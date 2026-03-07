@@ -209,19 +209,62 @@
             } catch (e) { console.warn("Фоновая проверка объявлений не удалась"); }
         })();
 
-        // --- 2. РАСЧЕТ ЗАХОДА СОЛНЦА ---
+        // --- 2. ОБНОВЛЕННЫЙ ТОЧНЫЙ РАСЧЕТ ЗАХОДА СОЛНЦА (МОСКВА) ---
         function getSunset(date) {
-            const lat = 55.7532; const lng = 37.6225;
-            const radians = Math.PI / 180;
+            const lat = 55.7532; 
+            const lng = 37.6225;
+            const timezone = 3; // MSK UTC+3
+            
+            const PI = Math.PI;
             const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
-            const decl = 0.409 * Math.sin(2 * Math.PI * (dayOfYear - 81) / 365);
-            const ha = Math.acos(-Math.tan(lat * radians) * Math.tan(decl));
-            const sunsetUTC = 12 + (ha / radians) / 15 - (lng / 15);
-            let local = sunsetUTC + 3; // MSK
-            const eqTime = 0.165 * Math.sin(2 * decl) - 0.126 * Math.cos(decl);
-            local -= eqTime;
-            const h = Math.floor(local);
-            const m = Math.floor((local - h) * 60);
+            
+            // Расчет зенита (стандартный заход с учетом рефракции)
+            const zenith = 90.833 * PI / 180;
+            
+            // 1. Приблизительное время в днях
+            const lngHour = lng / 15;
+            const t = dayOfYear + ((18 - lngHour) / 24);
+            
+            // 2. Средняя аномалия Солнца
+            const M = (0.9856 * t) - 3.289;
+            
+            // 3. Истинная долгота Солнца
+            let L = M + (1.916 * Math.sin(M * PI / 180)) + (0.020 * Math.sin(2 * M * PI / 180)) + 282.634;
+            L = (L + 360) % 360;
+            
+            // 4. Прямое восхождение
+            let RA = Math.atan(0.91764 * Math.tan(L * PI / 180)) * 180 / PI;
+            RA = (RA + 360) % 360;
+            
+            // Подгонка квадранта
+            const Lquadrant  = (Math.floor(L / 90)) * 90;
+            const RAquadrant = (Math.floor(RA / 90)) * 90;
+            RA = (RA + (Lquadrant - RAquadrant)) / 15;
+            
+            // 5. Склонение
+            const sinDec = 0.39782 * Math.sin(L * PI / 180);
+            const cosDec = Math.cos(Math.asin(sinDec));
+            
+            // 6. Часовой угол
+            const cosH = (Math.cos(zenith) - (sinDec * Math.sin(lat * PI / 180))) / (cosDec * Math.cos(lat * PI / 180));
+            
+            if (cosH > 1) return "Не заходит";
+            if (cosH < -1) return "Не восходит";
+            
+            const H = Math.acos(cosH) * 180 / PI / 15;
+            
+            // 7. Местное время (UTC)
+            const T = H + RA - (0.06571 * t) - 6.622;
+            let UT = (T - lngHour + 24) % 24;
+            
+            // 8. Перевод в МСК
+            let localTime = (UT + timezone) % 24;
+            
+            const h = Math.floor(localTime);
+            const m = Math.round((localTime - h) * 60);
+            
+            // Если округление дало 60 минут
+            if (m === 60) return `${(h + 1) % 24}:00`;
             return `${h}:${m < 10 ? '0' + m : m}`;
         }
 
@@ -232,14 +275,19 @@
             const dateOptions = { day: 'numeric', month: 'long' };
             const formattedDate = (d) => d.toLocaleDateString('ru-RU', dateOptions).toUpperCase();
 
+            // Если сегодня суббота, показываем сегодняшний заход
             if (day === 6) {
                 document.getElementById('sunset-label').innerText = "ЗАХОД СОЛНЦА СЕГОДНЯ (" + formattedDate(target) + ")";
                 document.querySelector('.sunset-container').style.boxShadow = "0 0 15px rgba(226, 176, 74, 0.2)";
             } else {
+                // Иначе ищем ближайшую пятницу
                 let diff = (5 - day + 7) % 7;
                 target.setDate(now.getDate() + diff);
                 document.getElementById('sunset-label').innerText = "НАЧАЛО СУББОТЫ (ПЯТНИЦА, " + formattedDate(target) + ")";
             }
+            
+            // Устанавливаем 12:00 для исключения ошибок смены даты при расчете
+            target.setHours(12, 0, 0, 0);
             document.getElementById('sunset-display').innerText = getSunset(target);
         }
         initSunset();
