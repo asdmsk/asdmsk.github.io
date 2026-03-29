@@ -1,4 +1,4 @@
-const CACHE_NAME = 'akd-final-v25';
+const CACHE_NAME = 'akd-final-v26';
 const GH_PATH = ''; // Это критично: теперь путь пустой, так как мы в корне домена
 
 const ASSETS_TO_CACHE = [
