@@ -33,12 +33,10 @@
         </div>
 
         <script>
-            // МГНОВЕННАЯ УСТАНОВКА ВРЕМЕНИ
-            // Этот скрипт стоит здесь, чтобы текст появился до загрузки плееров
+            // МГНОВЕННОЕ ВРЕМЯ
             (function() {
                 const year = new Date().getFullYear();
-                const timeStr = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
-                document.getElementById('live-time').innerText = timeStr;
+                document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
             })();
         </script>
 
@@ -51,68 +49,58 @@
             </a>
         </div>
 
-        <span class="section-label">Плеер Rutube: <span id="rutube-status" class="status-badge">ПОИСК...</span></span>
+        <span class="section-label">Плеер Rutube: <span id="rutube-status" class="status-badge">ЗАГРУЗКА...</span></span>
         <div class="video-container">
             <iframe id="rutubePlayer" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
         </div>
 
         <span class="section-label">Плеер YouTube:</span>
         <div class="video-container">
-            <iframe allowfullscreen="" frameborder="0" src="//www.youtube.com/embed/live_stream?channel=UC93Fr_uHbGHLPk713WCG55w&rel=0&autoplay=1&vq=hd720"></iframe>
+            <iframe allowfullscreen frameborder="0" src="//www.youtube.com/embed/live_stream?channel=UC93Fr_uHbGHLPk713WCG55w&rel=0&autoplay=1&vq=hd720"></iframe>
         </div>
 
-        <nav>
-            <a href="index.html" class="btn" style="justify-content: center;">
-                <i class="fas fa-arrow-left"></i><span>НА ГЛАВНУЮ</span>
-            </a>
-        </nav>
-
-        <footer>
-            <p>© 2026 Община на Стремянном</p>
-        </footer>
+        <nav><a href="index.html" class="btn" style="justify-content: center;"><i class="fas fa-arrow-left"></i><span>НА ГЛАВНУЮ</span></a></nav>
+        <footer><p>© 2026 Община на Стремянном</p></footer>
     </div>
 
     <script>
-        // АВТОМАТИЧЕСКИЙ ПОИСК ID ТРАНСЛЯЦИИ В ФОНЕ
-        async function autoLoadRutube() {
-            const channelId = '24704952';
-            const statusEl = document.getElementById('rutube-status');
+        async function loadFromGoogleSheets() {
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5kIIPvzs7ZsDJjdDWzVjHGqcp_sUEeV-PCeWznbiHUv2GeWGKSxMYtyvZh9CzRt9nItm_bpyYQ63c/pub?gid=711141389&single=true&output=csv';
             const player = document.getElementById('rutubePlayer');
+            const statusEl = document.getElementById('rutube-status');
+            // НОВЫЙ РЕЗЕРВНЫЙ ID
+            const backupId = "0f58426c7bac2c67a070222ba623a166";
 
             try {
-                // Используем прокси для получения кода страницы
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://rutube.ru/channel/' + channelId + '/')}`);
-                const data = await response.json();
-                const html = data.contents;
-
-                // Ищем 32-значный ID актуального видео
-                const match = html.match(/rutube\.ru\/play\/embed\/([a-z0-9]{32})/);
+                const response = await fetch(csvUrl);
+                const csvData = await response.text();
+                const rows = csvData.split('\n');
                 
-                if (match && match[1]) {
-                    const videoId = match[1];
-                    player.src = `https://rutube.ru/play/embed/${videoId}/?skinColor=d57700`;
-                    
-                    // Проверяем статус эфира в коде
-                    if (html.toLowerCase().includes('live') || html.toLowerCase().includes('эфир')) {
-                        statusEl.innerText = "ПРЯМОЙ ЭФИР";
-                        statusEl.style.color = "#00ff00";
+                if (rows.length > 0) {
+                    const columns = rows[0].split(',');
+                    const title = columns[0] || "";
+                    const link = columns[1] || "";
+
+                    if (link && link.includes('rutube.ru')) {
+                        const match = link.match(/([a-z0-9]{32})/);
+                        if (match) {
+                            player.src = `https://rutube.ru/play/embed/${match[0]}/?skinColor=d57700`;
+                            statusEl.innerText = (title.toLowerCase().includes('эфир') || title.toLowerCase().includes('трансляция')) ? "ПРЯМОЙ ЭФИР" : "АРХИВ";
+                        } else {
+                            throw new Error("ID не найден в ссылке");
+                        }
                     } else {
-                        statusEl.innerText = "АРХИВ";
+                        throw new Error("Ссылка пуста");
                     }
-                } else {
-                    // Резервное видео, если ID не найден
-                    player.src = "https://rutube.ru/play/embed/0f58426c7bac2c67a070222ba623a166";
-                    statusEl.innerText = "АРХИВ";
                 }
             } catch (e) {
-                console.error("Rutube Error:", e);
-                player.src = "https://rutube.ru/play/embed/0f58426c7bac2c67a070222ba623a166";
+                console.error("Загрузка из таблицы не удалась, ставим резерв:", e);
+                player.src = `https://rutube.ru/play/embed/${backupId}/?skinColor=d57700`;
                 statusEl.innerText = "АРХИВ";
             }
         }
 
-        // Запускаем поиск Rutube без ожидания загрузки всей страницы
-        autoLoadRutube();
+        loadFromGoogleSheets();
     </script>
 </body>
 </html>
