@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106917530', 'ym');
-    ym(106917530, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Трансляция: На Стремянном</title>
@@ -31,14 +22,6 @@
             <span style="opacity: 0.8; font-size: 0.8rem;">ВРЕМЯ НАЧАЛА:</span>
             <span id="live-time" class="time-display">...</span>
         </div>
-
-        <script>
-            // Мгновенная установка времени
-            (function() {
-                const year = new Date().getFullYear();
-                document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
-            })();
-        </script>
 
         <div class="channel-row">
             <a href="https://rutube.ru/channel/24704952/" class="btn" target="_blank">
@@ -64,51 +47,53 @@
     </div>
 
     <script>
-        async function loadFromGoogleSheets() {
-            const baseCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5kIIPvzs7ZsDJjdDWzVjHGqcp_sUEeV-PCeWznbiHUv2GeWGKSxMYtyvZh9CzRt9nItm_bpyYQ63c/pub?gid=711141389&single=true&output=csv';
-            // Используем прокси для надежности
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(baseCsvUrl)}&_=${Date.now()}`;
-            
+        // 1. Установка времени (сразу при загрузке)
+        const year = new Date().getFullYear();
+        document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
+
+        // 2. Функция получения данных через ваш API
+        async function loadRutubeData() {
             const player = document.getElementById('rutubePlayer');
             const statusEl = document.getElementById('rutube-status');
-            const backupId = "0f58426c7bac2c67a070222ba623a166"; 
+            const backupId = "0f58426c7bac2c67a070222ba623a166"; // Заглушка
+            
+            // Ваша ссылка на Google Apps Script
+            const apiUrl = 'https://script.google.com/macros/s/AKfycbxKwnbrMdSss3sRvhaPKflqQApMjjC_8O7L1NKQMPMp0WopuHd7TXapwyo2h477aqYT/exec';
 
             try {
-                const response = await fetch(proxyUrl);
-                const json = await response.json();
-                const csvData = json.contents; 
+                // Запрос к API (Google Scripts автоматически обрабатывает перенаправления)
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Ошибка сети');
                 
-                // Берем самую первую строку данных
-                const firstRow = csvData.split('\n')[0];
-                
-                // Ищем 32-значный ID Rutube (например, 3a6a53600dd4f22de83c383256489ab8)
-                const idMatch = firstRow.match(/[a-z0-9]{32}/);
-                
-                if (idMatch) {
-                    const videoId = idMatch[0];
-                    player.src = `https://rutube.ru/play/embed/${videoId}/?skinColor=d57700`;
+                const data = await response.json();
+
+                if (data.id) {
+                    // Устанавливаем найденный ID видео
+                    player.src = `https://rutube.ru/play/embed/${data.id}/?skinColor=d57700`;
                     
-                    // Проверяем наличие ключевых слов для статуса
-                    const lowerText = firstRow.toLowerCase();
-                    if (lowerText.includes('трансляция') || lowerText.includes('эфир') || lowerText.includes('live')) {
+                    // Устанавливаем статус (Эфир или Архив)
+                    if (data.live) {
                         statusEl.innerText = "ПРЯМОЙ ЭФИР";
                         statusEl.style.color = "#00ff00";
+                        statusEl.style.fontWeight = "bold";
                     } else {
                         statusEl.innerText = "АРХИВ";
                         statusEl.style.color = "#ffffff";
                     }
                 } else {
-                    throw new Error("ID видео не найден в строке");
+                    throw new Error("ID не получен");
                 }
 
             } catch (e) {
-                console.error("Ошибка синхронизации:", e);
+                console.error("Ошибка API:", e);
+                // В случае любой ошибки ставим вашу заглушку
                 player.src = `https://rutube.ru/play/embed/${backupId}/?skinColor=d57700`;
                 statusEl.innerText = "АРХИВ (РЕЗЕРВ)";
             }
         }
 
-        loadFromGoogleSheets();
+        // Запускаем процесс
+        loadRutubeData();
     </script>
 </body>
 </html>
