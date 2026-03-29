@@ -33,7 +33,7 @@
         </div>
 
         <script>
-            // МГНОВЕННОЕ ВРЕМЯ
+            // Мгновенная установка времени
             (function() {
                 const year = new Date().getFullYear();
                 document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
@@ -49,7 +49,7 @@
             </a>
         </div>
 
-        <span class="section-label">Плеер Rutube: <span id="rutube-status" class="status-badge">ЗАГРУЗКА...</span></span>
+        <span class="section-label">Плеер Rutube: <span id="rutube-status" class="status-badge">СИНХРОНИЗАЦИЯ...</span></span>
         <div class="video-container">
             <iframe id="rutubePlayer" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
         </div>
@@ -65,38 +65,46 @@
 
     <script>
         async function loadFromGoogleSheets() {
-            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5kIIPvzs7ZsDJjdDWzVjHGqcp_sUEeV-PCeWznbiHUv2GeWGKSxMYtyvZh9CzRt9nItm_bpyYQ63c/pub?gid=711141389&single=true&output=csv';
+            const baseCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5kIIPvzs7ZsDJjdDWzVjHGqcp_sUEeV-PCeWznbiHUv2GeWGKSxMYtyvZh9CzRt9nItm_bpyYQ63c/pub?gid=711141389&single=true&output=csv';
+            // Используем прокси для надежности
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(baseCsvUrl)}&_=${Date.now()}`;
+            
             const player = document.getElementById('rutubePlayer');
             const statusEl = document.getElementById('rutube-status');
-            // НОВЫЙ РЕЗЕРВНЫЙ ID
-            const backupId = "0f58426c7bac2c67a070222ba623a166";
+            const backupId = "0f58426c7bac2c67a070222ba623a166"; 
 
             try {
-                const response = await fetch(csvUrl);
-                const csvData = await response.text();
-                const rows = csvData.split('\n');
+                const response = await fetch(proxyUrl);
+                const json = await response.json();
+                const csvData = json.contents; 
                 
-                if (rows.length > 0) {
-                    const columns = rows[0].split(',');
-                    const title = columns[0] || "";
-                    const link = columns[1] || "";
-
-                    if (link && link.includes('rutube.ru')) {
-                        const match = link.match(/([a-z0-9]{32})/);
-                        if (match) {
-                            player.src = `https://rutube.ru/play/embed/${match[0]}/?skinColor=d57700`;
-                            statusEl.innerText = (title.toLowerCase().includes('эфир') || title.toLowerCase().includes('трансляция')) ? "ПРЯМОЙ ЭФИР" : "АРХИВ";
-                        } else {
-                            throw new Error("ID не найден в ссылке");
-                        }
+                // Берем самую первую строку данных
+                const firstRow = csvData.split('\n')[0];
+                
+                // Ищем 32-значный ID Rutube (например, 3a6a53600dd4f22de83c383256489ab8)
+                const idMatch = firstRow.match(/[a-z0-9]{32}/);
+                
+                if (idMatch) {
+                    const videoId = idMatch[0];
+                    player.src = `https://rutube.ru/play/embed/${videoId}/?skinColor=d57700`;
+                    
+                    // Проверяем наличие ключевых слов для статуса
+                    const lowerText = firstRow.toLowerCase();
+                    if (lowerText.includes('трансляция') || lowerText.includes('эфир') || lowerText.includes('live')) {
+                        statusEl.innerText = "ПРЯМОЙ ЭФИР";
+                        statusEl.style.color = "#00ff00";
                     } else {
-                        throw new Error("Ссылка пуста");
+                        statusEl.innerText = "АРХИВ";
+                        statusEl.style.color = "#ffffff";
                     }
+                } else {
+                    throw new Error("ID видео не найден в строке");
                 }
+
             } catch (e) {
-                console.error("Загрузка из таблицы не удалась, ставим резерв:", e);
+                console.error("Ошибка синхронизации:", e);
                 player.src = `https://rutube.ru/play/embed/${backupId}/?skinColor=d57700`;
-                statusEl.innerText = "АРХИВ";
+                statusEl.innerText = "АРХИВ (РЕЗЕРВ)";
             }
         }
 
