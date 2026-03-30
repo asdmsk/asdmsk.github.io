@@ -42,58 +42,63 @@
             <iframe allowfullscreen frameborder="0" src="//www.youtube.com/embed/live_stream?channel=UC93Fr_uHbGHLPk713WCG55w&rel=0&autoplay=1&vq=hd720"></iframe>
         </div>
 
-        <nav><a href="index.html" class="btn" style="justify-content: center;"><i class="fas fa-arrow-left"></i><span>НА ГЛАВНУЮ</span></a></nav>
-        <footer><p>© 2026 Община на Стремянном</p></footer>
+        <nav>
+            <a href="index.html" class="btn" style="justify-content: center;">
+                <i class="fas fa-arrow-left"></i><span>НА ГЛАВНУЮ</span>
+            </a>
+        </nav>
+
+        <footer>
+            <p>© 2026 Община на Стремянном</p>
+        </footer>
     </div>
 
     <script>
-        // 1. Установка времени (сразу при загрузке)
-        const year = new Date().getFullYear();
+        // 1. Определение времени и дня недели
+        const now = new Date();
+        const isSaturday = (now.getDay() === 6); // 6 - суббота
+        const year = now.getFullYear();
         document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
 
-        // 2. Функция получения данных через ваш API
-        async function loadRutubeData() {
+        // 2. Загрузка данных из нового вебхука
+        async function loadContent() {
             const player = document.getElementById('rutubePlayer');
             const statusEl = document.getElementById('rutube-status');
-            const backupId = "0f58426c7bac2c67a070222ba623a166"; // Заглушка
             
-            // Ваша ссылка на Google Apps Script
-            const apiUrl = 'https://script.google.com/macros/s/AKfycbzESun2oLw6skJXBNrQ2L3EV19SNYIksGHaUTpdwavMayWUDQzTAufxD_OL-4YMsKbj/exec';
+            // Ваш новый вебхук
+            const apiUrl = 'https://script.google.com/macros/s/AKfycbxFe1G5S7dQncUuV5xt0KLrNonFSOvVNdUzUa-Qb9QVsIDsh6YwrUWSBoH9Fn_fNi5C/exec';
 
             try {
-                // Запрос к API (Google Scripts автоматически обрабатывает перенаправления)
                 const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Ошибка сети');
-                
                 const data = await response.json();
 
-                if (data.id) {
-                    // Устанавливаем найденный ID видео
-                    player.src = `https://rutube.ru/play/embed/${data.id}/?skinColor=d57700`;
-                    
-                    // Устанавливаем статус (Эфир или Архив)
-                    if (data.live) {
-                        statusEl.innerText = "ПРЯМОЙ ЭФИР";
+                if (isSaturday) {
+                    // СУББОТА: показываем трансляцию/концерт
+                    if (data.liveId) {
+                        player.src = `https://rutube.ru/play/embed/${data.liveId}/?skinColor=d57700`;
+                        statusEl.innerText = "ПРЯМОЙ ЭФИР / КОНЦЕРТ";
                         statusEl.style.color = "#00ff00";
-                        statusEl.style.fontWeight = "bold";
                     } else {
-                        statusEl.innerText = "АРХИВ";
-                        statusEl.style.color = "#ffffff";
+                        statusEl.innerText = "ЭФИР НЕ НАЙДЕН";
                     }
                 } else {
-                    throw new Error("ID не получен");
+                    // БУДНИ: показываем последнюю проповедь
+                    if (data.sermonId) {
+                        player.src = `https://rutube.ru/play/embed/${data.sermonId}/?skinColor=d57700`;
+                        statusEl.innerText = "ПОСЛЕДНЯЯ ПРОПОВЕДЬ";
+                        statusEl.style.color = "#e2b04a";
+                    } else {
+                        statusEl.innerText = "ПРОПОВЕДЬ НЕ НАЙДЕНА";
+                    }
                 }
 
             } catch (e) {
-                console.error("Ошибка API:", e);
-                // В случае любой ошибки ставим вашу заглушку
-                player.src = `https://rutube.ru/play/embed/${backupId}/?skinColor=d57700`;
-                statusEl.innerText = "АРХИВ (РЕЗЕРВ)";
+                console.error("Ошибка загрузки данных вебхука:", e);
+                statusEl.innerText = "ОШИБКА ПОДКЛЮЧЕНИЯ";
             }
         }
 
-        // Запускаем процесс
-        loadRutubeData();
+        loadContent();
     </script>
 </body>
 </html>
