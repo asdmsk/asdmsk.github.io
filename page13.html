@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head><!-- Yandex.Metrika counter -->
-<script type="text/javascript">
-    (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106917530', 'ym');
-
-    ym(106917530, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/106917530" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-<!-- /Yandex.Metrika counter -->
+<head>
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106917530', 'ym');
+        ym(106917530, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/106917530" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,9 +22,26 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <style>
+        /* Стиль для контейнера формы */
+        .form-container {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05); /* Легкий фон в стиле вашего сайта */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .form-container iframe {
+            display: block;
+            width: 100%;
+            height: 600px; /* Высота формы */
+            border: none;
+        }
+    </style>
+
     <script>
-        // Простая защита паролем
-        document.documentElement.style.display = 'none'; // Скрываем контент до проверки
+        document.documentElement.style.display = 'none'; 
         window.onload = function() {
             var password = prompt("Введите пароль доступа для общины:");
             if (password === "2026") { 
@@ -57,6 +74,11 @@
             <a href="https://us02web.zoom.us/j/2224204926" class="btn" target="_blank" rel="noopener">
                 <i class="fas fa-video"></i><span>МЕРОПРИЯТИЯ В ZOOM</span>
             </a>
+
+            <!-- ВСТАВКА ФОРМЫ -->
+            <div class="form-container">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScCLpU_W_xdvCWVF1Bp-MKYoC5b612Zo5J43UWYJT4Yqvjx4Q/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Загрузка...</iframe>
+            </div>
 
             <div class="divider"><span>ТЕЛЕГРАМ КАНАЛЫ</span></div>
 
