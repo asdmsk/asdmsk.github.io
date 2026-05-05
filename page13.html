@@ -23,24 +23,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* Стиль для контейнера формы */
-        .form-container {
-            width: 100%;
-            margin-top: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.05); /* Легкий фон в стиле вашего сайта */
+        /* Контейнер для формы в стиле Glassmorphism */
+        .form-wrapper {
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
-        .form-container iframe {
-            display: block;
+
+        .form-title {
+            text-align: center;
+            color: #fff;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Адаптация Google Формы под темную тему */
+        .form-wrapper iframe {
             width: 100%;
-            height: 600px; /* Высота формы */
+            height: 650px;
             border: none;
+            border-radius: 12px;
+            /* Инвертируем цвета: белый фон станет темным, текст - светлым */
+            filter: invert(92%) hue-rotate(180deg) brightness(1.1) contrast(0.9);
+            mix-blend-mode: screen; /* Помогает лучше смешать форму с фоном сайта */
+        }
+
+        /* Убираем лишние отступы для контейнера ссылок, если нужно */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
     </style>
 
     <script>
+        // Простая защита паролем
         document.documentElement.style.display = 'none'; 
         window.onload = function() {
             var password = prompt("Введите пароль доступа для общины:");
@@ -75,8 +101,9 @@
                 <i class="fas fa-video"></i><span>МЕРОПРИЯТИЯ В ZOOM</span>
             </a>
 
-            <!-- ВСТАВКА ФОРМЫ -->
-            <div class="form-container">
+            <!-- ВСТАВЛЕННАЯ ФОРМА -->
+            <div class="form-wrapper">
+                <div class="form-title">Оставить молитвенную просьбу</div>
                 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScCLpU_W_xdvCWVF1Bp-MKYoC5b612Zo5J43UWYJT4Yqvjx4Q/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Загрузка...</iframe>
             </div>
 
