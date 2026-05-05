@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
         (function(m,e,t,r,i,k,a){
             m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -12,8 +11,6 @@
         ym(106917530, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/106917530" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Для общины — На Стремянном</title>
@@ -23,51 +20,80 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* Контейнер для формы в стиле Glassmorphism */
-        .form-wrapper {
-            background: rgba(255, 255, 255, 0.03); 
+        /* Стили для встроеной формы */
+        .custom-form-container {
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
+            padding: 25px;
             margin: 20px 0;
-            padding: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        .form-title {
+        .form-header {
             text-align: center;
-            color: #fff;
-            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .form-header h2 {
+            font-size: 1rem;
             letter-spacing: 2px;
-            margin-bottom: 15px;
-            opacity: 0.6;
+            color: #fff;
+            opacity: 0.8;
             text-transform: uppercase;
-            font-weight: bold;
         }
 
-        /* Адаптация Google Формы под темную тему */
-        .form-wrapper iframe {
+        .custom-input {
             width: 100%;
-            height: 650px;
-            border: none;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            /* Инвертируем цвета: белый фон станет темным, текст - светлым */
-            filter: invert(92%) hue-rotate(180deg) brightness(1.1) contrast(0.9);
-            mix-blend-mode: screen; /* Помогает лучше смешать форму с фоном сайта */
+            padding: 15px;
+            color: #fff;
+            font-size: 16px; /* Предотвращает зум на iPhone */
+            margin-bottom: 15px;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.3s;
         }
 
-        /* Убираем лишние отступы для контейнера ссылок, если нужно */
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .custom-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
         }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .submit-btn {
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .submit-btn:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* Скрытие элементов до ввода пароля */
+        document-content { display: none; }
     </style>
 
     <script>
-        // Простая защита паролем
+        var submitted = false;
+        
+        // Скрытие контента
         document.documentElement.style.display = 'none'; 
+        
         window.onload = function() {
             var password = prompt("Введите пароль доступа для общины:");
             if (password === "2026") { 
@@ -77,6 +103,12 @@
                 window.location.href = "index.html";
             }
         };
+
+        function handleFormSubmit() {
+            submitted = true;
+            // Можно добавить анимацию загрузки на кнопку
+            document.querySelector('.submit-btn span').innerHTML = "ОТПРАВКА...";
+        }
     </script>
 </head>
 <body>
@@ -101,10 +133,30 @@
                 <i class="fas fa-video"></i><span>МЕРОПРИЯТИЯ В ZOOM</span>
             </a>
 
-            <!-- ВСТАВЛЕННАЯ ФОРМА -->
-            <div class="form-wrapper">
-                <div class="form-title">Оставить молитвенную просьбу</div>
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScCLpU_W_xdvCWVF1Bp-MKYoC5b612Zo5J43UWYJT4Yqvjx4Q/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Загрузка...</iframe>
+            <div class="custom-form-container">
+                <div class="form-header">
+                    <h2>Молитвенная просьба</h2>
+                </div>
+
+                <form id="prayerForm" 
+                      action="https://docs.google.com/forms/d/e/1FAIpQLScCLpU_W_xdvCWVF1Bp-MKYoC5b612Zo5J43UWYJT4Yqvjx4Q/formResponse" 
+                      method="POST" 
+                      target="hidden_iframe" 
+                      onsubmit="handleFormSubmit()">
+                    
+                    <input type="text" name="entry.1683723452" class="custom-input" placeholder="Ваше имя" required>
+                    
+                    <textarea name="entry.1506873583" class="custom-input" placeholder="Текст вашей просьбы..." rows="4" required></textarea>
+                    
+                    <input type="text" name="entry.2081056642" class="custom-input" placeholder="Контрольное слово (Аминь)" required>
+
+                    <button type="submit" class="btn submit-btn">
+                        <i class="fas fa-paper-plane"></i><span>ОТПРАВИТЬ</span>
+                    </button>
+                </form>
+
+                <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" 
+                        onload="if(submitted) { alert('Ваша молитвенная просьба принята!'); window.location.reload(); }"></iframe>
             </div>
 
             <div class="divider"><span>ТЕЛЕГРАМ КАНАЛЫ</span></div>
@@ -126,10 +178,11 @@
             <a href="https://t.me/asdmolitva_bot" class="btn" target="_blank" rel="noopener">
                 <i class="fas fa-pray"></i><span>МОЛИТВЕННАЯ ПРОСЬБА</span>
             </a>
-             <a href="https://disk.yandex.ru/d/K47NYXCelznSkw" class="btn" target="_blank" rel="noopener">
+            
+            <a href="https://disk.yandex.ru/d/K47NYXCelznSkw" class="btn" target="_blank" rel="noopener">
                 <i class="fas fa-pray"></i><span>Телеграм</span>
             </a>
-             <a href="https://disk.yandex.ru/d/EoAHOEMUNEayYQ" class="btn" target="_blank" rel="noopener">
+            <a href="https://disk.yandex.ru/d/EoAHOEMUNEayYQ" class="btn" target="_blank" rel="noopener">
                 <i class="fas fa-pray"></i><span>Портал</span>
             </a>
             <a href="https://warp-generator.github.io" class="btn" target="_blank" rel="noopener">
