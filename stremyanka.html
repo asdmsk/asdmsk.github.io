@@ -38,9 +38,54 @@
         </div>
 
         <span class="section-label">Плеер YouTube:</span>
-        <div class="video-container">
-            <iframe allowfullscreen frameborder="0" src="//www.youtube.com/embed/live_stream?channel=UC93Fr_uHbGHLPk713WCG55w&rel=0&autoplay=1&vq=hd720"></iframe>
-        </div>
+        <div id="youtube-live-player" style="width:100%; height:90%;">
+    <iframe
+        id="youtube-iframe"
+        width="100%"
+        height="100%"
+        src="about:blank"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen>
+    </iframe>
+</div>
+
+<script>
+const CHANNEL_ID = "UC93Fr_uHbGHLPk713WCG55w";
+
+async function loadLiveStream() {
+    try {
+        const response = await fetch(
+            `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`
+        );
+
+        const text = await response.text();
+
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, "application/xml");
+
+        const entries = xml.querySelectorAll("entry");
+
+        for (const entry of entries) {
+            const videoId = entry.querySelector("yt\\:videoId")?.textContent;
+
+            if (videoId) {
+                document.getElementById("youtube-iframe").src =
+                    `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+
+                return;
+            }
+        }
+    } catch (error) {
+        console.error("YouTube:", error);
+    }
+}
+
+loadLiveStream();
+
+// Проверяем наличие нового эфира каждые 60 секунд
+setInterval(loadLiveStream, 60000);
+</script>
 
         <nav>
             <a href="index.html" class="btn" style="justify-content: center;">
