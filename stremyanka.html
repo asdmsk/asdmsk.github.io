@@ -39,7 +39,15 @@
 
         <span class="section-label">Плеер YouTube:</span>
         <div class="video-container">
-            <iframe allowfullscreen frameborder="0" src="//www.youtube.com/embed/live_stream?channel=UC93Fr_uHbGHLPk713WCG55w&rel=0&autoplay=1&vq=hd720"></iframe>
+            <!-- Замените VIDEO_ID на реальный ID видео или трансляции -->
+            <iframe 
+                id="youtubePlayer"
+                src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&rel=0" 
+                title="YouTube live stream"
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
         </div>
 
         <nav>
@@ -60,12 +68,11 @@
         const year = now.getFullYear();
         document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
 
-        // 2. Загрузка данных из нового вебхука
+        // 2. Загрузка данных из вебхука
         async function loadContent() {
             const player = document.getElementById('rutubePlayer');
             const statusEl = document.getElementById('rutube-status');
             
-            // Ваш новый вебхук
             const apiUrl = 'https://script.google.com/macros/s/AKfycbxF635vQvSP0QTBJ4QdpfnbndTehP2RM1h9UDNAFvtneKexRUOyuLSImdvwivXIrQUR/exec';
 
             try {
