@@ -98,23 +98,26 @@
                 }
 
             } catch (e) {
-                console.error("Ошибка загрузки данных вебхука:", e);
+                console.error("Ошибка загрузки данных вебхука Rutube:", e);
                 statusEl.innerText = "ОШИБКА ПОДКЛЮЧЕНИЯ";
             }
         }
 
-        // 3. Отдельная загрузка свежего видео YouTube из вашего нового скрипта Google Apps Script
+        // 3. Отдельная загрузка свежего видео YouTube
         async function loadYouTubeStream() {
             const youtubePlayer = document.getElementById('youtubePlayer');
-            // Вставьте ниже URL вашего нового скрипта Google Apps Script, развернутого только для YouTube
-            const youtubeApiUrl = 'https://script.google.com/macros/s/AKfycbxC5BAfyEHLqxLpocRs_yH616Wugh5wPoD0Vw-G5U35xF_0jiXpl7ceG_lIOrjosoSk/exec';
+            // Актуальный рабочий URL вашего Google Apps Script для YouTube
+            const youtubeApiUrl = 'https://script.google.com/macros/s/AKfycbz0szceKCuFvHAsYOUM2-U-7tSj9MVJRghRAlfwL1-kHmRNz8x9kFtlTvUMH-D0FJAC/exec';
 
             try {
                 const response = await fetch(youtubeApiUrl);
                 const data = await response.json();
 
-                if (data.youtubeId) {
+                // Проверяем наличиe youtubeId и что он не содержит ошибок/текста
+                if (data.status === 'success' && data.youtubeId && !data.youtubeId.includes('НЕ НАЙДЕН') && !data.youtubeId.includes('Укажите')) {
                     youtubePlayer.src = `https://www.youtube.com/embed/${data.youtubeId}?autoplay=1&rel=0`;
+                } else {
+                    console.warn("YouTube: Прямой эфир или запись не найдены", data);
                 }
             } catch (e) {
                 console.error("Ошибка загрузки YouTube:", e);
