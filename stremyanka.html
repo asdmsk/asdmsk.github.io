@@ -66,10 +66,9 @@
         const year = now.getFullYear();
         document.getElementById('live-time').innerText = (year % 2 === 0) ? "Суббота 10:30" : "Суббота 14:30";
 
-        // 2. Загрузка данных из вебхука
+        // 2. Загрузка данных Rutube из исходного вебхука
         async function loadContent() {
             const player = document.getElementById('rutubePlayer');
-            const youtubePlayer = document.getElementById('youtubePlayer');
             const statusEl = document.getElementById('rutube-status');
             
             const apiUrl = 'https://script.google.com/macros/s/AKfycbxF635vQvSP0QTBJ4QdpfnbndTehP2RM1h9UDNAFvtneKexRUOyuLSImdvwivXIrQUR/exec';
@@ -78,8 +77,8 @@
                 const response = await fetch(apiUrl);
                 const data = await response.json();
 
-                // ------------------ RUTUBE (Логика без изменений) ------------------
                 if (isSaturday) {
+                    // СУББОТА: показываем трансляцию/концерт
                     if (data.liveId) {
                         player.src = `https://rutube.ru/play/embed/${data.liveId}/?skinColor=d57700`;
                         statusEl.innerText = "ПРЯМОЙ ЭФИР / КОНЦЕРТ";
@@ -88,6 +87,7 @@
                         statusEl.innerText = "ЭФИР НЕ НАЙДЕН";
                     }
                 } else {
+                    // БУДНИ: показываем последнюю проповедь
                     if (data.sermonId) {
                         player.src = `https://rutube.ru/play/embed/${data.sermonId}/?skinColor=d57700`;
                         statusEl.innerText = "ПРОПОВЕДЬ ПРОШЕДШЕЙ СУББОТЫ";
@@ -97,18 +97,32 @@
                     }
                 }
 
-                // ------------------ YOUTUBE (Автоматический подстановка) ------------------
-                if (data.youtubeId) {
-                    youtubePlayer.src = `https://www.youtube.com/embed/${data.youtubeId}?autoplay=1&rel=0`;
-                }
-
             } catch (e) {
                 console.error("Ошибка загрузки данных вебхука:", e);
                 statusEl.innerText = "ОШИБКА ПОДКЛЮЧЕНИЯ";
             }
         }
 
+        // 3. Отдельная загрузка свежего видео YouTube из вашего нового скрипта Google Apps Script
+        async function loadYouTubeStream() {
+            const youtubePlayer = document.getElementById('youtubePlayer');
+            // Вставьте ниже URL вашего нового скрипта Google Apps Script, развернутого только для YouTube
+            const youtubeApiUrl = 'https://script.google.com/macros/s/AKfycbxW3iNyj61qby-uSo3ZPMdbqGYPxnYRhWvAbwY6faRnfZSj51389vaxqePESVjPutdZ/exec';
+
+            try {
+                const response = await fetch(youtubeApiUrl);
+                const data = await response.json();
+
+                if (data.youtubeId) {
+                    youtubePlayer.src = `https://www.youtube.com/embed/${data.youtubeId}?autoplay=1&rel=0`;
+                }
+            } catch (e) {
+                console.error("Ошибка загрузки YouTube:", e);
+            }
+        }
+
         loadContent();
+        loadYouTubeStream();
     </script>
 </body>
 </html>
