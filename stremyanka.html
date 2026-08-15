@@ -39,13 +39,11 @@
 
         <span class="section-label">Плеер YouTube:</span>
         <div class="video-container">
-            <!-- Замените VIDEO_ID на реальный ID видео или трансляции -->
             <iframe 
-                id="youtubePlayer"
-                src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&rel=0" 
-                title="YouTube live stream"
+                id="youtubePlayer" 
+                src="" 
                 frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allow="autoplay; encrypted-media; picture-in-picture" 
                 allowfullscreen>
             </iframe>
         </div>
@@ -71,6 +69,7 @@
         // 2. Загрузка данных из вебхука
         async function loadContent() {
             const player = document.getElementById('rutubePlayer');
+            const youtubePlayer = document.getElementById('youtubePlayer');
             const statusEl = document.getElementById('rutube-status');
             
             const apiUrl = 'https://script.google.com/macros/s/AKfycbxF635vQvSP0QTBJ4QdpfnbndTehP2RM1h9UDNAFvtneKexRUOyuLSImdvwivXIrQUR/exec';
@@ -79,8 +78,8 @@
                 const response = await fetch(apiUrl);
                 const data = await response.json();
 
+                // ------------------ RUTUBE (Логика без изменений) ------------------
                 if (isSaturday) {
-                    // СУББОТА: показываем трансляцию/концерт
                     if (data.liveId) {
                         player.src = `https://rutube.ru/play/embed/${data.liveId}/?skinColor=d57700`;
                         statusEl.innerText = "ПРЯМОЙ ЭФИР / КОНЦЕРТ";
@@ -89,7 +88,6 @@
                         statusEl.innerText = "ЭФИР НЕ НАЙДЕН";
                     }
                 } else {
-                    // БУДНИ: показываем последнюю проповедь
                     if (data.sermonId) {
                         player.src = `https://rutube.ru/play/embed/${data.sermonId}/?skinColor=d57700`;
                         statusEl.innerText = "ПРОПОВЕДЬ ПРОШЕДШЕЙ СУББОТЫ";
@@ -97,6 +95,11 @@
                     } else {
                         statusEl.innerText = "ПРОПОВЕДЬ НЕ НАЙДЕНА";
                     }
+                }
+
+                // ------------------ YOUTUBE (Автоматический подстановка) ------------------
+                if (data.youtubeId) {
+                    youtubePlayer.src = `https://www.youtube.com/embed/${data.youtubeId}?autoplay=1&rel=0`;
                 }
 
             } catch (e) {
