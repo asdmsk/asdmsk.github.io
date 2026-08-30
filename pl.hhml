@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Быстрый переход</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #0d0d0d;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px auto;
+      display: block;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .btn-link {
+      width: 100%;
+      background-color: #141414;
+      border: 1px solid #262626;
+      border-radius: 16px;
+      color: #ffffff;
+      padding: 18px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-link:hover {
+      background-color: #1f1f1f;
+      border-color: #d4a359;
+      color: #d4a359;
+      transform: translateY(-2px);
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .status.error { color: #e53935; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="logo.png" alt="Логотип" class="logo" onerror="this.style.display='none'">
+
+  <h1 id="title">ПЛАН БОГОСЛУЖЕНИЯ</h1>
+  
+  <div id="content">
+    <div class="btn-group">
+      <!-- Укажите нужные ссылки и названия вместо # и Текста -->
+      <a href="https://docs.google.com/spreadsheets/d/1a9Nzok5YAESswS5zawY0BV2REvYf3UZmHQk0C8kGax0/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn-link">
+        🔗 Редактировать
+      </a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfX9O5WWFqlpjw7UtGmts5_KorRs9y3ENBR4xRslUOVhr2FGg/viewform?usp=header" target="_blank" rel="noopener noreferrer" class="btn-link">
+        🔗 Внести изменения
+      </a>
+      <a href="https://docs.google.com/spreadsheets/export?id=1a9Nzok5YAESswS5zawY0BV2REvYf3UZmHQk0C8kGax0&gid=0&exportFormat=pdf&fitw=true&portrait=false" target="_blank" rel="noopener noreferrer" class="btn-link">
+        🔗 Скачать PDF
+      </a>
+    </div>
+  </div>
+
+  <div id="status" class="status"></div>
+</div>
+
+<script>
+  // Ожидаемый код в URL хеше (#an)
+  const REQUIRED_CODE = "an";
+
+  function initPage() {
+    const rawHash = window.location.hash ? window.location.hash.substring(1) : "";
+    const codeVal = decodeURIComponent(rawHash).trim();
+
+    const contentEl = document.getElementById('content');
+    const statusEl = document.getElementById('status');
+    const titleEl = document.getElementById('title');
+
+    // Проверка совпадения кода
+    if (codeVal !== REQUIRED_CODE) {
+      if (contentEl) contentEl.style.display = "none";
+      if (titleEl) titleEl.textContent = "ОШИБКА";
+      if (statusEl) {
+        statusEl.className = "status error";
+        statusEl.textContent = "Некорректный код доступа или страница не найдена.";
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPage);
+  } else {
+    initPage();
+  }
+</script>
+
+</body>
+</html>
