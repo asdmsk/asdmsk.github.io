@@ -173,32 +173,62 @@
     "no": "Сообщить о своём неучастии по любой причине"
   };
 
+  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfX9O5WWFqlpjw7UtGmts5_KorRs9y3ENBR4xRslUOVhr2FGg/formResponse";
+
+  // Объявляем переменные элементов DOM на самом верху
+  let contentEl;
+  let statusEl;
+  let titleEl;
+  let nameVal = "";
+  let serviceKey = "";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    contentEl = document.getElementById('content');
+    statusEl = document.getElementById('status');
+    titleEl = document.getElementById('title');
+
+    const hashData = decodeURIComponent(window.location.hash.substring(1));
+    const params = hashData.split('-');
+
+    nameVal = params[0];
+    serviceKey = params[1];
+
+    if (!nameVal || !serviceKey || !SERVICES[serviceKey]) {
+      if (contentEl) contentEl.style.display = "none";
+      if (titleEl) titleEl.textContent = "ОШИБКА";
+      if (statusEl) {
+        statusEl.className = "status error";
+        statusEl.textContent = "Некорректная ссылка или отсутствуют параметры.";
+      }
+    } else {
+      document.getElementById('fioName').textContent = nameVal;
+      document.getElementById('serviceName').textContent = SERVICES[serviceKey];
+    }
+  });
+
   function sendAnswer(type) {
     const btnYes = document.getElementById('btnYes');
     const btnNo = document.getElementById('btnNo');
     
+    // Получаем статус, если элемент ещё не инициализирован
+    if (!statusEl) statusEl = document.getElementById('status');
+    if (!contentEl) contentEl = document.getElementById('content');
+    if (!titleEl) titleEl = document.getElementById('title');
+
     btnYes.disabled = true;
     btnNo.disabled = true;
+    
     statusEl.className = "status";
     statusEl.textContent = "Отправка ответа...";
 
     const serviceText = SERVICES[serviceKey];
     const answerText = ANSWERS[type];
 
-    // Используем URLSearchParams для кодирования в application/x-www-form-urlencoded
     const payload = new URLSearchParams();
-    
-    // 1. Служение
     payload.append("entry.1967454923", serviceText);
-    
-    // 2. Статус участия
     payload.append("entry.130958526", answerText);
-    
-    // 3. Выбор варианта "Другое" для участника
     payload.append("entry.1852639773", "__other_option__");
     payload.append("entry.1852639773.other_option_response", nameVal);
-    
-    // 4. Служебное поле Google Форм для радио-кнопок (сентинел)
     payload.append("entry.1852639773_sentinel", "");
 
     fetch(FORM_URL, {
@@ -223,6 +253,7 @@
     });
   }
 </script>
+
 
 </body>
 </html>
