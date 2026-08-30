@@ -207,20 +207,16 @@
     const serviceText = SERVICES[serviceKey];
     const answerText = ANSWERS[type];
 
-    // Формируем параметры в формате x-www-form-urlencoded
-    const payload = new URLSearchParams();
-    payload.append("entry.565247834", serviceText);
-    payload.append("entry.130958526", answerText);
-    payload.append("entry.1852639773", "__other_option__");
-    payload.append("entry.1852639773.other_option_response", nameVal);
+    const formData = new FormData();
+    // Исправленные ID полей из вашей ссылки:
+    formData.append("entry.1967454923", serviceText); 
+    formData.append("entry.130958526", answerText);
+    formData.append("entry.1852639773", nameVal);
 
     fetch(FORM_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: payload.toString()
+      body: formData
     })
     .then(() => {
       contentEl.style.display = "none";
