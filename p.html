@@ -24,7 +24,6 @@
       text-align: center;
     }
 
-    /* Логотип */
     .logo {
       width: 90px;
       height: 90px;
@@ -42,7 +41,6 @@
       color: #ffffff;
     }
 
-    /* Информационная карточка */
     .info-card {
       background-color: #14120e;
       border: 1px solid #d4a359;
@@ -52,7 +50,6 @@
       text-align: center;
     }
 
-    /* Увеличенный шрифт для участника и служения */
     .info-line {
       font-size: 19px;
       line-height: 1.4;
@@ -71,7 +68,6 @@
       margin-bottom: 20px;
     }
 
-    /* Кнопки в стиле основных ссылок */
     .btn-group {
       display: flex;
       flex-direction: column;
@@ -107,17 +103,9 @@
       cursor: not-allowed;
     }
 
-    .btn-yes {
-      border-color: #2e4d36;
-    }
-    
-    .btn-yes:hover {
-      border-color: #4CAF50;
-    }
-
-    .btn-no:hover {
-      border-color: #e53935;
-    }
+    .btn-yes { border-color: #2e4d36; }
+    .btn-yes:hover { border-color: #4CAF50; }
+    .btn-no:hover { border-color: #e53935; }
 
     .status {
       margin-top: 20px;
@@ -132,8 +120,7 @@
 <body>
 
 <div class="container">
-  <!-- Логотип сайта -->
-  <img src="/logo.png" alt="Логотип" class="logo" onerror="this.style.display='none'">
+  <img src="logo.png" alt="Логотип" class="logo" onerror="this.style.display='none'">
 
   <h1 id="title">ПОДТВЕРЖДЕНИЕ УЧАСТИЯ</h1>
   
@@ -175,45 +162,51 @@
 
   const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfX9O5WWFqlpjw7UtGmts5_KorRs9y3ENBR4xRslUOVhr2FGg/formResponse";
 
-  // Объявляем переменные элементов DOM на самом верху
-  let contentEl;
-  let statusEl;
-  let titleEl;
+  // Глобальное состояние
   let nameVal = "";
   let serviceKey = "";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    contentEl = document.getElementById('content');
-    statusEl = document.getElementById('status');
-    titleEl = document.getElementById('title');
+  function initPage() {
+    const rawHash = window.location.hash ? window.location.hash.substring(1) : "";
+    const hashData = decodeURIComponent(rawHash);
+    
+    // Парсим хэш по первому дефису (если в ФИО нет дефиса) или разделяем аккуратно
+    const lastDashIdx = hashData.lastIndexOf("-");
+    
+    if (lastDashIdx !== -1) {
+      nameVal = hashData.substring(0, lastDashIdx);
+      serviceKey = hashData.substring(lastDashIdx + 1);
+    }
 
-    const hashData = decodeURIComponent(window.location.hash.substring(1));
-    const params = hashData.split('-');
-
-    nameVal = params[0];
-    serviceKey = params[1];
+    const contentEl = document.getElementById('content');
+    const statusEl = document.getElementById('status');
+    const titleEl = document.getElementById('title');
 
     if (!nameVal || !serviceKey || !SERVICES[serviceKey]) {
       if (contentEl) contentEl.style.display = "none";
       if (titleEl) titleEl.textContent = "ОШИБКА";
       if (statusEl) {
         statusEl.className = "status error";
-        statusEl.textContent = "Некорректная ссылка или отсутствуют параметры.";
+        statusEl.textContent = "Некорректная ссылка или отсутствуют параметры в URL (#ФИО-ID).";
       }
     } else {
       document.getElementById('fioName').textContent = nameVal;
       document.getElementById('serviceName').textContent = SERVICES[serviceKey];
     }
-  });
+  }
 
   function sendAnswer(type) {
     const btnYes = document.getElementById('btnYes');
     const btnNo = document.getElementById('btnNo');
-    
-    // Получаем статус, если элемент ещё не инициализирован
-    if (!statusEl) statusEl = document.getElementById('status');
-    if (!contentEl) contentEl = document.getElementById('content');
-    if (!titleEl) titleEl = document.getElementById('title');
+    const statusEl = document.getElementById('status');
+    const contentEl = document.getElementById('content');
+    const titleEl = document.getElementById('title');
+
+    if (!nameVal || !serviceKey) {
+      statusEl.className = "status error";
+      statusEl.textContent = "Ошибка: данные участника не определены.";
+      return;
+    }
 
     btnYes.disabled = true;
     btnNo.disabled = true;
@@ -252,8 +245,14 @@
       statusEl.textContent = "Ошибка отправки. Попробуйте еще раз.";
     });
   }
-</script>
 
+  // Запуск парсинга после загрузки DOM
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPage);
+  } else {
+    initPage();
+  }
+</script>
 
 </body>
 </html>
