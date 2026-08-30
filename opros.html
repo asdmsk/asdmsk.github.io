@@ -67,7 +67,7 @@
       text-align: left;
     }
 
-    label {
+    label.field-title {
       display: block;
       font-size: 14px;
       font-weight: 600;
@@ -187,7 +187,7 @@
 
 <script>
   // ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT
-  const API_URL = "https://script.google.com/macros/s/AKfycbwFDOOpXmoay7l-8T5LMbrdqJiJ22aHxZ6RnBPkRZ9pvbPh9dNSaZkZTCzTfHoklgPx/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbz--vm1rrmuKFf_EkofUWw14dTgqC-V7dFgOFPd2hmq4PsDNQMcLQFLYv6M98XkkWk1/exec";
 
   let questionsData = [];
 
@@ -222,6 +222,7 @@
         group.className = 'field-group';
 
         const label = document.createElement('label');
+        label.className = 'field-title';
         label.innerHTML = `${idx + 1}. ${q.text} ${q.required ? '<span class="req">*</span>' : ''}`;
         group.appendChild(label);
 
@@ -229,7 +230,7 @@
           const container = document.createElement('div');
           container.className = 'choice-group';
 
-          q.options.forEach((optText, oIdx) => {
+          q.options.forEach((optText) => {
             const optLabel = document.createElement('label');
             optLabel.className = 'choice-option';
 
@@ -237,7 +238,6 @@
             radio.type = 'radio';
             radio.name = `q_${q.id}`;
             radio.value = optText;
-            if (q.required && oIdx === 0) radio.required = true;
 
             optLabel.appendChild(radio);
             optLabel.appendChild(document.createTextNode(optText));
@@ -314,41 +314,37 @@
   document.getElementById('surveyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Проверка обязательных чекбоксов
+    // Ручная проверка обязательных полей для радио и чекбоксов
     for (let q of questionsData) {
-      if ((q.type === 'чекбоксы' || q.type === 'много') && q.required) {
-        const checked = document.querySelectorAll(`input[name="q_${q.id}"]:checked`);
-        if (checked.length === 0) {
-          alert(`Пожалуйста, выберите хотя бы один вариант в вопросе: "${q.text}"`);
-          return;
+      if (q.required) {
+        if (q.type === 'чекбокс' || q.type === 'радио') {
+          const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+          if (!selected) {
+            alert(`Пожалуйста, выберите вариант ответа в вопросе: "${q.text}"`);
+            return;
+          }
+        }
+        if (q.type === 'чекбоксы' || q.type === 'много') {
+          const checked = document.querySelectorAll(`input[name="q_${q.id}"]:checked`);
+          if (checked.length === 0) {
+            alert(`Пожалуйста, выберите хотя бы один вариант в вопросе: "${q.text}"`);
+            return;
+          }
         }
       }
     }
 
-    // Универсальный сбор ответов (не даст потерять второй и последующие вопросы)
+    // Сбор ответов
     const answers = questionsData.map(q => {
-      // 1. Несколько чекбоксов
-      if (q.type === 'чекбоксы' || q.type === 'много') {
-        const checked = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
-        return checked.map(cb => cb.value).join(', ');
+      const checkedInputs = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
+      
+      if (checkedInputs.length > 0) {
+        return checkedInputs.map(item => item.value).join(', ');
       }
 
-      // 2. Один чекбокс / радио-кнопка
-      if (q.type === 'чекбокс' || q.type === 'радио') {
-        const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-        return selected ? selected.value : "";
-      }
-
-      // 3. Текстовые поля и выпадающие списки по ID
       const el = document.getElementById(`q_${q.id}`);
       if (el && el.value !== undefined) {
         return el.value.trim();
-      }
-
-      // 4. Резервный поиск по имени радио/чекбоксов, если тип в таблице был указан с опечаткой
-      const checkedGroup = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
-      if (checkedGroup.length > 0) {
-        return checkedGroup.map(cb => cb.value).join(', ');
       }
 
       return "";
@@ -365,7 +361,7 @@
       await fetch(API_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({ answers })
       });
 
