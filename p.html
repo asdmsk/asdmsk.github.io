@@ -169,31 +169,9 @@
   };
 
   const ANSWERS = {
-    "yes": "Сообщить о своём участии",
+    "yes": "Подтвердить участие",
     "no": "Сообщить о своём неучастии по любой причине"
   };
-
-  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfX9O5WWFqlpjw7UtGmts5_KorRs9y3ENBR4xRslUOVhr2FGg/formResponse";
-
-  const hashData = decodeURIComponent(window.location.hash.substring(1));
-  const params = hashData.split('-');
-
-  const nameVal = params[0];
-  const serviceKey = params[1];
-
-  const contentEl = document.getElementById('content');
-  const statusEl = document.getElementById('status');
-  const titleEl = document.getElementById('title');
-
-  if (!nameVal || !serviceKey || !SERVICES[serviceKey]) {
-    contentEl.style.display = "none";
-    titleEl.textContent = "ОШИБКА";
-    statusEl.className = "status error";
-    statusEl.textContent = "Некорректная ссылка или отсутствуют параметры.";
-  } else {
-    document.getElementById('fioName').textContent = nameVal;
-    document.getElementById('serviceName').textContent = SERVICES[serviceKey];
-  }
 
   function sendAnswer(type) {
     const btnYes = document.getElementById('btnYes');
@@ -208,10 +186,10 @@
     const answerText = ANSWERS[type];
 
     const formData = new FormData();
-    // Исправленные ID полей из вашей ссылки:
-    formData.append("entry.1967454923", serviceText); 
+    formData.append("entry.1967454923", serviceText);
     formData.append("entry.130958526", answerText);
-    formData.append("entry.1852639773", nameVal);
+    formData.append("entry.1852639773", "__other_option__");
+    formData.append("entry.1852639773.other_option_response", nameVal);
 
     fetch(FORM_URL, {
       method: "POST",
