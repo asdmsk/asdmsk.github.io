@@ -3,34 +3,145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Подтверждение служения</title>
-  
-  <!-- Подключаем основной CSS-файл вашего сайта -->
-  <link rel="stylesheet" href="/style.css"> 
+  <title>Подтверждение участия</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #0d0d0d;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 20px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    /* Информационная карточка в стиле таймера субботы */
+    .info-card {
+      background-color: #14120e;
+      border: 1px solid #d4a359;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .info-line {
+      font-size: 16px;
+      margin: 6px 0;
+      color: #e0e0e0;
+    }
+
+    .info-line strong {
+      color: #d4a359;
+      font-weight: 600;
+    }
+
+    .question-text {
+      font-size: 15px;
+      color: #a0a0a0;
+      margin-bottom: 20px;
+    }
+
+    /* Кнопки в стиле основных ссылок */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      width: 100%;
+      background-color: #141414;
+      border: 1px solid #262626;
+      border-radius: 16px;
+      color: #ffffff;
+      padding: 16px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background-color: #1f1f1f;
+      border-color: #d4a359;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-yes {
+      border-color: #2e4d36;
+    }
+    
+    .btn-yes:hover {
+      border-color: #4CAF50;
+    }
+
+    .btn-no:hover {
+      border-color: #e53935;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .status.success { color: #4CAF50; }
+    .status.error { color: #e53935; }
+  </style>
 </head>
 <body>
 
-<!-- Используйте те же теги и CSS-классы (class="..."), что и на вашем основном сайте -->
 <div class="container">
-  <div class="card">
-    <h1 id="title">Подтверждение участия</h1>
-    
-    <div id="content">
-      <div class="info-block">
-        <p><strong>Участник:</strong> <span id="fioName">-</span></p>
-        <p><strong>Служение:</strong> <span id="serviceName">-</span></p>
-      </div>
-      
-      <p>Сможете ли вы принять участие?</p>
-      
-      <div class="buttons">
-        <button id="btnYes" class="btn btn-primary" onclick="sendAnswer('yes')">Да, буду</button>
-        <button id="btnNo" class="btn btn-secondary" onclick="sendAnswer('no')">Нет, не смогу</button>
-      </div>
+  <h1 id="title">ПОДТВЕРЖДЕНИЕ УЧАСТИЯ</h1>
+  
+  <div id="content">
+    <div class="info-card">
+      <div class="info-line"><strong>Участник:</strong> <span id="fioName">-</span></div>
+      <div class="info-line"><strong>Служение:</strong> <span id="serviceName">-</span></div>
     </div>
 
-    <div id="status" class="status-message"></div>
+    <p class="question-text">Сможете ли вы принять участие?</p>
+    
+    <div class="btn-group">
+      <button id="btnYes" class="btn btn-yes" onclick="sendAnswer('yes')">
+        ✓ ДА, БУДУ
+      </button>
+      <button id="btnNo" class="btn btn-no" onclick="sendAnswer('no')">
+        ✕ НЕТ, НЕ СМОГУ
+      </button>
+    </div>
   </div>
+
+  <div id="status" class="status"></div>
 </div>
 
 <script>
@@ -62,7 +173,8 @@
 
   if (!nameVal || !serviceKey || !SERVICES[serviceKey]) {
     contentEl.style.display = "none";
-    titleEl.textContent = "Ошибка";
+    titleEl.textContent = "ОШИБКА";
+    statusEl.className = "status error";
     statusEl.textContent = "Некорректная ссылка или отсутствуют параметры.";
   } else {
     document.getElementById('fioName').textContent = nameVal;
@@ -75,6 +187,7 @@
     
     btnYes.disabled = true;
     btnNo.disabled = true;
+    statusEl.className = "status";
     statusEl.textContent = "Отправка ответа...";
 
     const serviceText = SERVICES[serviceKey];
@@ -93,12 +206,14 @@
     })
     .then(() => {
       contentEl.style.display = "none";
-      titleEl.textContent = "Спасибо!";
+      titleEl.textContent = "СПАСИБО!";
+      statusEl.className = "status success";
       statusEl.textContent = "✓ Ваш ответ успешно записан.";
     })
     .catch(err => {
       btnYes.disabled = false;
       btnNo.disabled = false;
+      statusEl.className = "status error";
       statusEl.textContent = "Ошибка отправки. Попробуйте еще раз.";
     });
   }
