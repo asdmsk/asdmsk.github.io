@@ -1,1 +1,251 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Опрос</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #0d0d0d;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .card {
+      background-color: #14120e;
+      border: 1px solid #d4a359;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 15px auto;
+      display: block;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    .stats-counter {
+      background: #1f1a12;
+      border: 1px solid #332615;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      font-size: 14px;
+      color: #d4a359;
+      margin-bottom: 24px;
+    }
+
+    .field-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #e0e0e0;
+    }
+
+    label .req { color: #e53935; }
+
+    input, textarea {
+      width: 100%;
+      background-color: #0d0d0d;
+      border: 1px solid #262626;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #d4a359;
+    }
+
+    .btn {
+      width: 100%;
+      background-color: #141414;
+      border: 1px solid #2e4d36;
+      border-radius: 12px;
+      color: #ffffff;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      border-color: #4CAF50;
+      background-color: #1a261c;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 15px;
+    }
+    .status.success { color: #4CAF50; }
+    .status.error { color: #e53935; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <img src="logo.png" alt="Логотип" class="logo" onerror="this.style.display='none'">
+    <h1>ОПРОС</h1>
+    <div id="counter" class="stats-counter">Загрузка данных...</div>
+    
+    <form id="surveyForm">
+      <div id="questionsContainer">Загрузка вопросов...</div>
+      <button type="submit" id="submitBtn" class="btn" style="display:none;">ОТПРАВИТЬ ОТВЕТ</button>
+    </form>
+    
+    <div id="status" class="status"></div>
+  </div>
+</div>
+
+<script>
+  // Вставьте сюда скопированный URL развернутого Web App из Apps Script
+  const API_URL = "https://script.google.com/macros/s/ВАШ_SCRIPT_ID/exec";
+
+  let questionsData = [];
+
+  async function loadSurvey() {
+    const counterEl = document.getElementById('counter');
+    const containerEl = document.getElementById('questionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+
+      if (data.isClosed) {
+        counterEl.style.display = "none";
+        submitBtn.style.display = "none";
+        containerEl.innerHTML = `
+          <div style="text-align: center; padding: 20px 0;">
+            <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+            <h2 style="font-size: 18px; color: #d4a359; margin-bottom: 8px;">ОПРОС ЗАКРЫТ</h2>
+            <p style="color: #a0a0a0; font-size: 14px;">${data.closeReason}</p>
+          </div>
+        `;
+        return;
+      }
+
+      questionsData = data.questions;
+      counterEl.textContent = `📊 Всего заполнено анкет: ${data.totalSubmissions}`;
+      containerEl.innerHTML = "";
+
+      questionsData.forEach((q, idx) => {
+        const group = document.createElement('div');
+        group.className = 'field-group';
+
+        const label = document.createElement('label');
+        label.innerHTML = `${idx + 1}. ${q.text} ${q.required ? '<span class="req">*</span>' : ''}`;
+        group.appendChild(label);
+
+        let input;
+        if (q.type === 'текст' || q.type === 'тест') {
+          input = document.createElement('textarea');
+          input.rows = 2;
+        } else {
+          input = document.createElement('input');
+          if (q.type === 'email' || q.type === 'электронная почта') input.type = 'email';
+          else if (q.type === 'телефон' || q.type === 'номер телефона') input.type = 'tel';
+          else if (q.type === 'число') input.type = 'number';
+          else input.type = 'text';
+        }
+
+        input.id = `q_${q.id}`;
+        input.required = q.required;
+        group.appendChild(input);
+
+        containerEl.appendChild(group);
+      });
+
+      submitBtn.style.display = "block";
+    } catch (err) {
+      containerEl.innerHTML = '<div class="status error">Ошибка загрузки вопросов.</div>';
+      counterEl.style.display = "none";
+    }
+  }
+
+  document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const answers = questionsData.map(q => {
+      const val = document.getElementById(`q_${q.id}`).value;
+      return val ? val.trim() : "";
+    });
+
+    submitBtn.disabled = true;
+    statusEl.className = "status";
+    statusEl.textContent = "Отправка...";
+
+    try {
+      await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers })
+      });
+
+      document.getElementById('surveyForm').style.display = "none";
+      statusEl.className = "status success";
+      statusEl.textContent = "✓ Спасибо! Ваш ответ успешно сохранен.";
+    } catch (err) {
+      submitBtn.disabled = false;
+      statusEl.className = "status error";
+      statusEl.textContent = "Ошибка отправки. Попробуйте еще раз.";
+    }
+  });
+
+  loadSurvey();
+</script>
+
+</body>
+</html>
