@@ -185,16 +185,29 @@
     const serviceText = SERVICES[serviceKey];
     const answerText = ANSWERS[type];
 
-    const formData = new FormData();
-    formData.append("entry.1967454923", serviceText);
-    formData.append("entry.130958526", answerText);
-    formData.append("entry.1852639773", "__other_option__");
-    formData.append("entry.1852639773.other_option_response", nameVal);
+    // Используем URLSearchParams для кодирования в application/x-www-form-urlencoded
+    const payload = new URLSearchParams();
+    
+    // 1. Служение
+    payload.append("entry.1967454923", serviceText);
+    
+    // 2. Статус участия
+    payload.append("entry.130958526", answerText);
+    
+    // 3. Выбор варианта "Другое" для участника
+    payload.append("entry.1852639773", "__other_option__");
+    payload.append("entry.1852639773.other_option_response", nameVal);
+    
+    // 4. Служебное поле Google Форм для радио-кнопок (сентинел)
+    payload.append("entry.1852639773_sentinel", "");
 
     fetch(FORM_URL, {
       method: "POST",
       mode: "no-cors",
-      body: formData
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: payload.toString()
     })
     .then(() => {
       contentEl.style.display = "none";
