@@ -231,13 +231,11 @@
 </div>
 
 <script>
-  // ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT
   const API_URL = "https://script.google.com/macros/s/AKfycbz7ixKJit6arRwA2yew9-iwafmimShumXnCaNwnGVF6ex88FRoHC3t9M3zS72XY62Zq/exec";
-
-  // КОЛИЧЕСТВО ВОПРОСОВ НА ОДНОЙ СТРАНИЦЕ
   const QUESTIONS_PER_PAGE = 3;
 
   let questionsData = [];
+  let userAnswers = {}; // Глобальный объект для хранения ВСЕХ ответов
   let currentPage = 0;
   let totalPages = 1;
 
@@ -276,6 +274,26 @@
     }
   }
 
+  // Функция сохранения ответов с ТЕКУЩЕЙ страницы в глобальную память
+  function saveCurrentPageAnswers() {
+    const startIndex = currentPage * QUESTIONS_PER_PAGE;
+    const endIndex = Math.min(startIndex + QUESTIONS_PER_PAGE, questionsData.length);
+    const currentQuestions = questionsData.slice(startIndex, endIndex);
+
+    currentQuestions.forEach(q => {
+      const checkedInputs = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
+      
+      if (checkedInputs.length > 0) {
+        userAnswers[q.id] = checkedInputs.map(item => item.value).join(', ');
+      } else {
+        const el = document.getElementById(`q_${q.id}`);
+        if (el && el.value !== undefined) {
+          userAnswers[q.id] = el.value.trim();
+        }
+      }
+    });
+  }
+
   function renderPage() {
     const containerEl = document.getElementById('questionsContainer');
     const progressEl = document.getElementById('progressBar');
@@ -296,13 +314,14 @@
       label.innerHTML = `${q.id}. ${q.text} ${q.required ? '<span class="req">*</span>' : ''}`;
       group.appendChild(label);
 
-      // Если в таблице включено "Показывать результат" и в столбце E есть текст
       if (q.showResult && q.resultText) {
         const resBox = document.createElement('div');
         resBox.className = 'result-box';
         resBox.innerHTML = `📌 <b>Информация:</b> ${q.resultText}`;
         group.appendChild(resBox);
       }
+
+      const savedValue = userAnswers[q.id] || "";
 
       if (q.type === 'чекбокс' || q.type === 'радио') {
         const container = document.createElement('div');
@@ -316,6 +335,7 @@
           radio.type = 'radio';
           radio.name = `q_${q.id}`;
           radio.value = optText;
+          if (savedValue === optText) radio.checked = true;
 
           optLabel.appendChild(radio);
           optLabel.appendChild(document.createTextNode(optText));
@@ -326,6 +346,7 @@
       } else if (q.type === 'чекбоксы' || q.type === 'много') {
         const container = document.createElement('div');
         container.className = 'choice-group';
+        const savedArray = savedValue ? savedValue.split(', ') : [];
 
         q.options.forEach(optText => {
           const optLabel = document.createElement('label');
@@ -335,6 +356,7 @@
           cb.type = 'checkbox';
           cb.name = `q_${q.id}`;
           cb.value = optText;
+          if (savedArray.includes(optText)) cb.checked = true;
 
           optLabel.appendChild(cb);
           optLabel.appendChild(document.createTextNode(optText));
@@ -350,13 +372,14 @@
         defaultOpt.value = "";
         defaultOpt.textContent = "-- Выберите вариант --";
         defaultOpt.disabled = true;
-        defaultOpt.selected = true;
+        if (!savedValue) defaultOpt.selected = true;
         input.appendChild(defaultOpt);
 
         q.options.forEach(optText => {
           const opt = document.createElement('option');
           opt.value = optText;
           opt.textContent = optText;
+          if (savedValue === optText) opt.selected = true;
           input.appendChild(opt);
         });
         group.appendChild(input);
@@ -374,6 +397,7 @@
           else input.type = 'text';
         }
         input.id = `q_${q.id}`;
+        input.value = savedValue;
         group.appendChild(input);
       }
 
@@ -432,6 +456,7 @@
 
   document.getElementById('nextBtn').addEventListener('click', () => {
     if (validateCurrentPage()) {
+      saveCurrentPageAnswers(); // Сохраняем перед переходом
       currentPage++;
       renderPage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -439,6 +464,7 @@
   });
 
   document.getElementById('prevBtn').addEventListener('click', () => {
+    saveCurrentPageAnswers(); // Сохраняем перед возвратом
     currentPage--;
     renderPage();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -448,22 +474,10 @@
     e.preventDefault();
 
     if (!validateCurrentPage()) return;
+    saveCurrentPageAnswers(); // Сохраняем ответы последней страницы
 
-    // Сбор ответов по абсолютно всем вопросам
-    const answers = questionsData.map(q => {
-      const checkedInputs = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
-      
-      if (checkedInputs.length > 0) {
-        return checkedInputs.map(item => item.value).join(', ');
-      }
-
-      const el = document.getElementById(`q_${q.id}`);
-      if (el && el.value !== undefined) {
-        return el.value.trim();
-      }
-
-      return "";
-    });
+    // Собираем полный массив ответов строго по порядку ID вопросов
+    const answers = questionsData.map(q => userAnswers[q.id] || "");
 
     const statusEl = document.getElementById('status');
     const submitBtn = document.getElementById('submitBtn');
@@ -500,5 +514,6 @@
   loadSurvey();
 </script>
 
+  
 </body>
 </html>
