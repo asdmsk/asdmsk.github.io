@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -78,7 +77,7 @@
 
     label .req { color: #e53935; }
 
-    input, textarea {
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea, select {
       width: 100%;
       background-color: #0d0d0d;
       border: 1px solid #262626;
@@ -90,8 +89,48 @@
       transition: border-color 0.2s;
     }
 
-    input:focus, textarea:focus {
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input:focus, textarea:focus, select:focus {
       border-color: #d4a359;
+    }
+
+    .choice-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .choice-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #0d0d0d;
+      border: 1px solid #262626;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      font-size: 14px;
+      font-weight: normal;
+      margin-bottom: 0;
+    }
+
+    .choice-option:hover {
+      border-color: #d4a359;
+    }
+
+    .choice-option input[type="checkbox"],
+    .choice-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #d4a359;
+      cursor: pointer;
     }
 
     .btn {
@@ -147,8 +186,8 @@
 </div>
 
 <script>
-  // Вставьте сюда скопированный URL развернутого Web App из Apps Script
-  const API_URL = "https://script.google.com/macros/s/AKfycbx4an7R9Y-K42KmC5vFce0U9O9km3l39Qkx0WJBYwDT1Ubjzvc3VvLUdNnaORfjV9yL/exec";
+  // ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT
+  const API_URL = "https://script.google.com/macros/s/ВАШ_SCRIPT_ID/exec";
 
   let questionsData = [];
 
@@ -186,41 +225,120 @@
         label.innerHTML = `${idx + 1}. ${q.text} ${q.required ? '<span class="req">*</span>' : ''}`;
         group.appendChild(label);
 
-        let input;
-        if (q.type === 'текст' || q.type === 'тест') {
-          input = document.createElement('textarea');
-          input.rows = 2;
-        } else {
-          input = document.createElement('input');
-          if (q.type === 'email' || q.type === 'электронная почта') input.type = 'email';
-          else if (q.type === 'телефон' || q.type === 'номер телефона') input.type = 'tel';
-          else if (q.type === 'число') input.type = 'number';
-          else input.type = 'text';
-        }
+        if (q.type === 'чекбокс' || q.type === 'радио') {
+          const container = document.createElement('div');
+          container.className = 'choice-group';
 
-        input.id = `q_${q.id}`;
-        input.required = q.required;
-        group.appendChild(input);
+          q.options.forEach((optText, oIdx) => {
+            const optLabel = document.createElement('label');
+            optLabel.className = 'choice-option';
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = `q_${q.id}`;
+            radio.value = optText;
+            if (q.required && oIdx === 0) radio.required = true;
+
+            optLabel.appendChild(radio);
+            optLabel.appendChild(document.createTextNode(optText));
+            container.appendChild(optLabel);
+          });
+          group.appendChild(container);
+
+        } else if (q.type === 'чекбоксы' || q.type === 'много') {
+          const container = document.createElement('div');
+          container.className = 'choice-group';
+
+          q.options.forEach(optText => {
+            const optLabel = document.createElement('label');
+            optLabel.className = 'choice-option';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.name = `q_${q.id}`;
+            cb.value = optText;
+
+            optLabel.appendChild(cb);
+            optLabel.appendChild(document.createTextNode(optText));
+            container.appendChild(optLabel);
+          });
+          group.appendChild(container);
+
+        } else if (q.type === 'список' || q.type === 'варианты') {
+          const input = document.createElement('select');
+          input.id = `q_${q.id}`;
+          input.required = q.required;
+          
+          const defaultOpt = document.createElement('option');
+          defaultOpt.value = "";
+          defaultOpt.textContent = "-- Выберите вариант --";
+          defaultOpt.disabled = true;
+          defaultOpt.selected = true;
+          input.appendChild(defaultOpt);
+
+          q.options.forEach(optText => {
+            const opt = document.createElement('option');
+            opt.value = optText;
+            opt.textContent = optText;
+            input.appendChild(opt);
+          });
+          group.appendChild(input);
+
+        } else {
+          let input;
+          if (q.type === 'текст' || q.type === 'тест') {
+            input = document.createElement('textarea');
+            input.rows = 2;
+          } else {
+            input = document.createElement('input');
+            if (q.type === 'email' || q.type === 'электронная почта') input.type = 'email';
+            else if (q.type === 'телефон' || q.type === 'номер телефона') input.type = 'tel';
+            else if (q.type === 'число') input.type = 'number';
+            else input.type = 'text';
+          }
+          input.id = `q_${q.id}`;
+          input.required = q.required;
+          group.appendChild(input);
+        }
 
         containerEl.appendChild(group);
       });
 
       submitBtn.style.display = "block";
     } catch (err) {
-      containerEl.innerHTML = '<div class="status error">Ошибка загрузки вопросов.</div>';
+      containerEl.innerHTML = '<div class="status error">Ошибка загрузки вопросов. Проверьте ссылку API.</div>';
       counterEl.style.display = "none";
     }
   }
 
   document.getElementById('surveyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const statusEl = document.getElementById('status');
-    const submitBtn = document.getElementById('submitBtn');
+    
+    for (let q of questionsData) {
+      if ((q.type === 'чекбоксы' || q.type === 'много') && q.required) {
+        const checked = document.querySelectorAll(`input[name="q_${q.id}"]:checked`);
+        if (checked.length === 0) {
+          alert(`Пожалуйста, выберите хотя бы один вариант в вопросе: "${q.text}"`);
+          return;
+        }
+      }
+    }
 
     const answers = questionsData.map(q => {
-      const val = document.getElementById(`q_${q.id}`).value;
-      return val ? val.trim() : "";
+      if (q.type === 'чекбоксы' || q.type === 'много') {
+        const checked = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
+        return checked.map(cb => cb.value).join(', ');
+      }
+      if (q.type === 'чекбокс' || q.type === 'радио') {
+        const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+        return selected ? selected.value : "";
+      }
+      const el = document.getElementById(`q_${q.id}`);
+      return el && el.value ? el.value.trim() : "";
     });
+
+    const statusEl = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
 
     submitBtn.disabled = true;
     statusEl.className = "status";
