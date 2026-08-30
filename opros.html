@@ -187,7 +187,7 @@
 
 <script>
   // ВСТАВЬТЕ СЮДА ВАШ URL ИЗ GOOGLE APPS SCRIPT
-  const API_URL = "https://script.google.com/macros/s/AKfycbwnIBhLPOi9OwMrbRFAt2of2awiY7z07q_KahhoZprcwKdCd5wLvLHMQ6Al4HLSMoJp/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbztMInekzuYZZH_3wfHEeWw93ygwa_OalyfRSX2qiZsludvzAxhApbfnHQw8lHg88AG/exec";
 
   let questionsData = [];
 
@@ -314,6 +314,7 @@
   document.getElementById('surveyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // Проверка обязательных чекбоксов
     for (let q of questionsData) {
       if ((q.type === 'чекбоксы' || q.type === 'много') && q.required) {
         const checked = document.querySelectorAll(`input[name="q_${q.id}"]:checked`);
@@ -324,17 +325,33 @@
       }
     }
 
+    // Универсальный сбор ответов (не даст потерять второй и последующие вопросы)
     const answers = questionsData.map(q => {
+      // 1. Несколько чекбоксов
       if (q.type === 'чекбоксы' || q.type === 'много') {
         const checked = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
         return checked.map(cb => cb.value).join(', ');
       }
+
+      // 2. Один чекбокс / радио-кнопка
       if (q.type === 'чекбокс' || q.type === 'радио') {
         const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
         return selected ? selected.value : "";
       }
+
+      // 3. Текстовые поля и выпадающие списки по ID
       const el = document.getElementById(`q_${q.id}`);
-      return el && el.value ? el.value.trim() : "";
+      if (el && el.value !== undefined) {
+        return el.value.trim();
+      }
+
+      // 4. Резервный поиск по имени радио/чекбоксов, если тип в таблице был указан с опечаткой
+      const checkedGroup = Array.from(document.querySelectorAll(`input[name="q_${q.id}"]:checked`));
+      if (checkedGroup.length > 0) {
+        return checkedGroup.map(cb => cb.value).join(', ');
+      }
+
+      return "";
     });
 
     const statusEl = document.getElementById('status');
