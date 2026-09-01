@@ -167,46 +167,63 @@
   let serviceKey = "";
 
   function initPage() {
+    // 1. Извлекаем данные из ? или #
     let rawData = window.location.search ? window.location.search.substring(1) : "";
     if (!rawData && window.location.hash) {
         rawData = window.location.hash.substring(1);
     }
     
-    // 1. Декодируем
-    let hashData = decodeURIComponent(rawData);
-    
-    // 2. Заменяем обратно '_' на пробелы для точного совпадения в базе
-    hashData = hashData.replace(/_/g, " "); 
+    // Если параметр пуст — выходим
+    if (!rawData) {
+        showError("Отсутствуют параметры в URL.");
+        return;
+    }
 
-    // Объявляем переменные
+    // 2. Декодируем и восстанавливаем пробелы из '_'
+    let hashData = decodeURIComponent(rawData).replace(/_/g, " "); 
+
     let nameVal = "";
     let serviceKey = "";
 
-    // 3. Парсим по последнему дефису
+    // 3. Разделяем по последнему дефису
     const lastDashIdx = hashData.lastIndexOf("-");
-    
     if (lastDashIdx !== -1) {
-      nameVal = hashData.substring(0, lastDashIdx);
-      serviceKey = hashData.substring(lastDashIdx + 1);
+        nameVal = hashData.substring(0, lastDashIdx).trim();
+        serviceKey = hashData.substring(lastDashIdx + 1).trim();
     }
 
+    // 4. Элементы интерфейса
+    const contentEl = document.getElementById('content');
+    const statusEl = document.getElementById('status');
+    const titleEl = document.getElementById('title');
+    const fioEl = document.getElementById('fioName');
+    const serviceEl = document.getElementById('serviceName');
+
+    // Проверка наличия ключа в словаре SERVICES
+    if (!nameVal || !serviceKey || typeof SERVICES === 'undefined' || !SERVICES[serviceKey]) {
+        showError("Некорректная ссылка или сервис не найден.");
+    } else {
+        if (fioEl) fioEl.textContent = nameVal;
+        if (serviceEl) serviceEl.textContent = SERVICES[serviceKey];
+        if (contentEl) contentEl.style.display = "block";
+    }
+}
+
+function showError(msg) {
     const contentEl = document.getElementById('content');
     const statusEl = document.getElementById('status');
     const titleEl = document.getElementById('title');
 
-    if (!nameVal || !serviceKey || !SERVICES[serviceKey]) {
-      if (contentEl) contentEl.style.display = "none";
-      if (titleEl) titleEl.textContent = "ОШИБКА";
-      if (statusEl) {
+    if (contentEl) contentEl.style.display = "none";
+    if (titleEl) titleEl.textContent = "ОШИБКА";
+    if (statusEl) {
         statusEl.className = "status error";
-        statusEl.textContent = "Некорректная ссылка или отсутствуют параметры в URL (?ФИО-ID).";
-      }
-    } else {
-      document.getElementById('fioName').textContent = nameVal;
-      document.getElementById('serviceName').textContent = SERVICES[serviceKey];
+        statusEl.textContent = msg;
     }
-} // <-- Теперь функция закрывается СДЕСЬ, в самом конце!
+}
 
+// Запуск при готовности DOM
+document.addEventListener('DOMContentLoaded', initPage);
   function sendAnswer(type) {
     const btnYes = document.getElementById('btnYes');
     const btnNo = document.getElementById('btnNo');
