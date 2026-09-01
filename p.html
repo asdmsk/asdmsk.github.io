@@ -167,8 +167,8 @@
   let serviceKey = "";
 
   function initPage() {
-    const rawHash = window.location.hash ? window.location.hash.substring(1) : "";
-    const hashData = decodeURIComponent(rawHash);
+    const rawSearch = window.location.search ? window.location.search.substring(1) : "";
+    const hashData = decodeURIComponent(rawSearch);
     
     // Парсим хэш по первому дефису (если в ФИО нет дефиса) или разделяем аккуратно
     const lastDashIdx = hashData.lastIndexOf("-");
