@@ -110,18 +110,17 @@
 </div>
 
 <script>
-  // Ожидаемый код в URL хеше (#an)
   const REQUIRED_CODE = "an";
 
   function initPage() {
-    const rawHash = window.location.hash ? window.location.search.substring(1) : "";
-    const codeVal = decodeURIComponent(rawHash).trim();
+    // Считываем значение после '?'
+    const rawSearch = window.location.search ? window.location.search.substring(1) : "";
+    const codeVal = decodeURIComponent(rawSearch).trim();
 
     const contentEl = document.getElementById('content');
     const statusEl = document.getElementById('status');
     const titleEl = document.getElementById('title');
 
-    // Проверка совпадения кода
     if (codeVal !== REQUIRED_CODE) {
       if (contentEl) contentEl.style.display = "none";
       if (titleEl) titleEl.textContent = "ОШИБКА";
