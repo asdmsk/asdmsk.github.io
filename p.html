@@ -177,9 +177,12 @@
     
     // 2. Заменяем обратно '_' на пробелы для точного совпадения в базе
     hashData = hashData.replace(/_/g, " "); 
-}
-    
-    // Парсим хэш по первому дефису (если в ФИО нет дефиса) или разделяем аккуратно
+
+    // Объявляем переменные
+    let nameVal = "";
+    let serviceKey = "";
+
+    // 3. Парсим по последнему дефису
     const lastDashIdx = hashData.lastIndexOf("-");
     
     if (lastDashIdx !== -1) {
@@ -196,13 +199,13 @@
       if (titleEl) titleEl.textContent = "ОШИБКА";
       if (statusEl) {
         statusEl.className = "status error";
-        statusEl.textContent = "Некорректная ссылка или отсутствуют параметры в URL (#ФИО-ID).";
+        statusEl.textContent = "Некорректная ссылка или отсутствуют параметры в URL (?ФИО-ID).";
       }
     } else {
       document.getElementById('fioName').textContent = nameVal;
       document.getElementById('serviceName').textContent = SERVICES[serviceKey];
     }
-  }
+} // <-- Теперь функция закрывается СДЕСЬ, в самом конце!
 
   function sendAnswer(type) {
     const btnYes = document.getElementById('btnYes');
