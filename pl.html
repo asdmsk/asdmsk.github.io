@@ -93,7 +93,6 @@
   
   <div id="content">
     <div class="btn-group">
-      <!-- Укажите нужные ссылки и названия вместо # и Текста -->
       <a href="https://docs.google.com/spreadsheets/d/1a9Nzok5YAESswS5zawY0BV2REvYf3UZmHQk0C8kGax0/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn-link">
         🔗 Редактировать
       </a>
@@ -113,14 +112,25 @@
   const REQUIRED_CODE = "an";
 
   function initPage() {
-    // Считываем значение после '?'
-    const rawSearch = window.location.search ? window.location.search.substring(1) : "";
-    const codeVal = decodeURIComponent(rawSearch).trim();
+    // 1. Проверяем параметры после '?' (search), а если их нет — после '#' (hash)
+    let rawData = window.location.search ? window.location.search.substring(1) : "";
+    if (!rawData && window.location.hash) {
+      rawData = window.location.hash.substring(1);
+    }
+
+    // 2. Декодируем и очищаем значение
+    let codeVal = decodeURIComponent(rawData).trim();
+
+    // Забираем только первое значение, если передано несколько параметров через &
+    if (codeVal.includes('&')) {
+      codeVal = codeVal.split('&')[0];
+    }
 
     const contentEl = document.getElementById('content');
     const statusEl = document.getElementById('status');
     const titleEl = document.getElementById('title');
 
+    // 3. Проверка соответствия кода
     if (codeVal !== REQUIRED_CODE) {
       if (contentEl) contentEl.style.display = "none";
       if (titleEl) titleEl.textContent = "ОШИБКА";
