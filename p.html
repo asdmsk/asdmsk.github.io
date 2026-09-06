@@ -182,10 +182,7 @@
     // 2. Декодируем и восстанавливаем пробелы из '_'
     let hashData = decodeURIComponent(rawData).replace(/_/g, " "); 
 
-    let nameVal = "";
-    let serviceKey = "";
-
-    // 3. Разделяем по последнему дефису
+    // 3. Разделяем по последнему дефису (присваиваем напрямую в глобальные переменные)
     const lastDashIdx = hashData.lastIndexOf("-");
     if (lastDashIdx !== -1) {
         nameVal = hashData.substring(0, lastDashIdx).trim();
@@ -194,8 +191,6 @@
 
     // 4. Элементы интерфейса
     const contentEl = document.getElementById('content');
-    const statusEl = document.getElementById('status');
-    const titleEl = document.getElementById('title');
     const fioEl = document.getElementById('fioName');
     const serviceEl = document.getElementById('serviceName');
 
@@ -207,9 +202,9 @@
         if (serviceEl) serviceEl.textContent = SERVICES[serviceKey];
         if (contentEl) contentEl.style.display = "block";
     }
-}
+  }
 
-function showError(msg) {
+  function showError(msg) {
     const contentEl = document.getElementById('content');
     const statusEl = document.getElementById('status');
     const titleEl = document.getElementById('title');
@@ -220,10 +215,8 @@ function showError(msg) {
         statusEl.className = "status error";
         statusEl.textContent = msg;
     }
-}
+  }
 
-// Запуск при готовности DOM
-document.addEventListener('DOMContentLoaded', initPage);
   function sendAnswer(type) {
     const btnYes = document.getElementById('btnYes');
     const btnNo = document.getElementById('btnNo');
@@ -275,7 +268,7 @@ document.addEventListener('DOMContentLoaded', initPage);
     });
   }
 
-  // Запуск парсинга после загрузки DOM
+  // Запуск при готовности DOM
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initPage);
   } else {
