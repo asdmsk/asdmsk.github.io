@@ -39,6 +39,8 @@
             <iframe id="rutubePlayer" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
         </div>
 
+        <!-- СТАРЫЙ ВТОРОЙ ПЛЕЕР YOUTUBE ВРЕМЕННО ОТКЛЮЧЕН
+
         <span class="section-label">Плеер YouTube:</span>
         <div class="video-container">
             <iframe 
@@ -50,8 +52,10 @@
             </iframe>
         </div>
 
+        КОНЕЦ СТАРОГО ВТОРОГО ПЛЕЕРА -->
+
         <!-- ТРЕТИЙ ПЛЕЕР YOUTUBE: ПОСТОЯННЫЙ ПРЯМОЙ ЭФИР КАНАЛА -->
-        <span class="section-label">Плеер YouTube: Прямой эфир канала</span>
+        <span class="section-label">Плеер YouTube: Прямой эфир</span>
         <div class="video-container">
             <iframe
                 id="youtubeLivePlayer"
@@ -119,7 +123,8 @@
             }
         }
 
-        // 3. Отдельная загрузка свежего видео YouTube
+        // 3. СТАРАЯ ЗАГРУЗКА YOUTUBE ВРЕМЕННО ОТКЛЮЧЕНА
+        /*
         async function loadYouTubeStream() {
             const youtubePlayer = document.getElementById('youtubePlayer');
             // Актуальный рабочий URL вашего Google Apps Script для YouTube
@@ -139,9 +144,10 @@
                 console.error("Ошибка загрузки YouTube:", e);
             }
         }
+        */
 
         loadContent();
-        loadYouTubeStream();
+        // loadYouTubeStream(); // Старый YouTube временно отключен
     </script>
 </body>
 </html>
