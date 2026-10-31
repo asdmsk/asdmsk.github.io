@@ -1,8 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Трансляция: На Стремянном</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
@@ -47,6 +49,20 @@
                 allowfullscreen>
             </iframe>
         </div>
+
+        <!-- ТРЕТИЙ ПЛЕЕР YOUTUBE: ПОСТОЯННЫЙ ПРЯМОЙ ЭФИР КАНАЛА -->
+        <span class="section-label">Плеер YouTube: Прямой эфир канала</span>
+        <div class="video-container">
+            <iframe
+                id="youtubeLivePlayer"
+                src="https://www.youtube.com/embed/live_stream?channel=UC93Fr_uHbGHLPk713WCG55w"
+                frameborder="0"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <!-- КОНЕЦ ТРЕТЬЕГО ПЛЕЕРА -->
 
         <nav>
             <a href="index.html" class="btn" style="justify-content: center;">
@@ -129,3 +145,4 @@
     </script>
 </body>
 </html>
+```
